@@ -47,6 +47,16 @@ body::before{
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 :focus-visible{outline:2px solid var(--turq);outline-offset:3px;border-radius:6px}
 
+/* Fond d'ambiance réservé à l'écran de quiz. Se fond en douceur, disparaît
+   ailleurs. Si quiz-bg.jpg manque, il ne se passe simplement rien. */
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:url("quiz-bg.jpg") center/cover no-repeat;
+  opacity:0;transition:opacity .55s ease;
+}
+body[data-page="quiz"]::after{opacity:1}
+@media (prefers-reduced-motion:reduce){ body::after{transition:none} }
+
 /* ---------- shell ---------- */
 .shell{
   position:relative; z-index:1;
@@ -272,7 +282,10 @@ p{margin:0 0 12px;color:var(--muted)}
 .cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ccard{
   position:relative;border-radius:14px;padding:13px;min-height:112px;
-  background:linear-gradient(165deg,rgba(123,47,247,.20),var(--ink2) 60%);
+  background:
+    linear-gradient(165deg,rgba(123,47,247,.22),rgba(11,6,22,.80) 62%),
+    url("card-bg.jpg") center/cover no-repeat,
+    var(--ink2);
   border:1px solid rgba(232,184,75,.34);
   display:flex;flex-direction:column;
 }
@@ -908,6 +921,7 @@ function viewInfos(){
 
 /* ---------- rendu --------------------------------------------------------- */
 function render(){
+  document.body.dataset.page = S.page;
   const lv = levelOf(S.xp);
   document.getElementById("xpVal").textContent = S.xp;
   document.getElementById("lvlEmo").textContent = lv.emoji;
