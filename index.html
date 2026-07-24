@@ -10,6 +10,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="Kizomba Urban Quiz" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,700;12..96,75..100,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
@@ -61,14 +64,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
   background:linear-gradient(180deg,rgba(5,3,10,.96),rgba(5,3,10,.78) 70%,transparent);
   backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
 }
-.mark{
-  width:34px;height:34px;flex:0 0 34px;border-radius:11px;
-  display:grid;place-items:center;
-  background:conic-gradient(from 200deg,var(--violet),var(--rasp),var(--gold),var(--turq),var(--violet));
-  font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:-.5px;
-  color:#0b0616;
-  box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 6px 18px rgba(123,47,247,.35);
-}
+.mark{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center}
+.mark svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 10px rgba(123,47,247,.45))}
 .head-id{flex:1;min-width:0}
 .head-id b{
   display:block;font-family:var(--display);font-weight:800;font-size:14px;
@@ -315,7 +312,16 @@ p{margin:0 0 12px;color:var(--muted)}
 <body>
 
 <header class="head">
-  <div class="mark">KQ</div>
+  <div class="mark">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <defs><linearGradient id="kuq" x1="0" y1="0" x2="0.33" y2="1">
+        <stop offset="0" stop-color="#A472FF"/><stop offset="0.55" stop-color="#7B2FF7"/><stop offset="1" stop-color="#2FE0C8"/>
+      </linearGradient></defs>
+      <circle cx="60" cy="60" r="33" fill="none" stroke="url(#kuq)" stroke-width="12"
+              stroke-linecap="round" stroke-dasharray="163.5 43.9" transform="rotate(83.3 60 60)"/>
+      <path d="M76 76 L95 95" stroke="#E8B84B" stroke-width="12" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
   <div class="head-id">
     <b>Kizomba Urban</b>
     <span>Quiz</span>
