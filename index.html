@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="Kizomba Urban Quiz" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="manifest.webmanifest" />
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,700;12..96,75..100,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
@@ -268,6 +268,28 @@ p{margin:0 0 12px;color:var(--muted)}
 .ccard h3{font-size:13.5px;margin-bottom:5px}
 .ccard p{font-size:10.5px;line-height:1.4;margin:0;color:var(--muted)}
 .ccard .from{margin-top:auto;padding-top:7px;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.ccard{padding-right:38px}
+.share-btn{
+  position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:9px;
+  border:1px solid rgba(232,184,75,.32);background:rgba(232,184,75,.10);
+  color:var(--gold);font-size:14px;line-height:1;display:grid;place-items:center;
+}
+.share-btn:active{background:rgba(232,184,75,.24)}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;
+  background:rgba(123,47,247,.13);border:1px solid rgba(164,114,255,.34);
+  font-size:12px;white-space:nowrap;
+}
+.badge b{font-size:13px;color:var(--violet-soft)}
+.badge i{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+         text-transform:uppercase;color:var(--muted)}
+.badge.gold{background:rgba(232,184,75,.12);border-color:rgba(232,184,75,.42)}
+.badge.gold b{color:var(--gold)}
+.streak{
+  margin:-6px 0 14px;font-size:12px;color:var(--muted);text-align:center;
+}
+.streak b{color:var(--gold);font-family:var(--mono)}
 .empty{
   text-align:center;padding:38px 20px;border:1px dashed var(--line);border-radius:18px;color:var(--muted);
 }
@@ -376,6 +398,12 @@ const PACKS = [
 
 const K = {xp:"kizombaUrban_xp_v3", cards:"kizombaUrban_cards_v3", seen:"kizombaUrban_seen_v3", daily:"kizombaUrban_daily_v3"};
 
+/* Deux paliers seulement. Un badge qu'on obtient tout le temps ne vaut rien. */
+const BADGE_TIERS = [
+  {min:50,  label:"Initié", emoji:"◆"},
+  {min:100, label:"Maître", emoji:"★"}
+];
+
 /* ---------- stockage protégé (correctif 3) ------------------------------- */
 function read(key, fallback){
   try{
@@ -396,7 +424,8 @@ let S = {
   cards: Array.isArray(read(K.cards,[])) ? read(K.cards,[]) : [],
   seen: Array.isArray(read(K.seen,[])) ? read(K.seen,[]) : [],
   pack:null, queue:[], idx:0, picked:[], done:false, ok:false,
-  score:0, gained:0, fresh:[], log:[], sound:false
+  score:0, gained:0, fresh:[], log:[], sound:false,
+  daily: (() => { const d = read(K.daily,{}); return {last:d.last||"", streak:d.streak||0, best:d.best||0}; })()
 };
 
 /* ---------- utilitaires -------------------------------------------------- */
@@ -417,6 +446,32 @@ function masteryOf(id){
   const pool = poolOf(id);
   if(!pool.length) return 0;
   return Math.round(100 * pool.filter(q => S.seen.includes(q.i)).length / pool.length);
+}
+
+function badgesOf(){
+  return PACKS.map(p => {
+    const m = masteryOf(p.id);
+    const tier = BADGE_TIERS.filter(t => m >= t.min).pop();
+    return tier ? {pack:p, tier, m} : null;
+  }).filter(Boolean);
+}
+
+/* Date LOCALE. toISOString() renvoie l'heure UTC : en France l'été, le quiz
+   du jour changeait à 2 h du matin au lieu de minuit. */
+function todayKey(d = new Date()){
+  return d.getFullYear() + "-" +
+         String(d.getMonth()+1).padStart(2,"0") + "-" +
+         String(d.getDate()).padStart(2,"0");
+}
+
+function registerDaily(){
+  const today = todayKey();
+  if(S.daily.last === today) return;
+  const yesterday = todayKey(new Date(Date.now() - 86400000));
+  S.daily.streak = (S.daily.last === yesterday) ? S.daily.streak + 1 : 1;
+  S.daily.last = today;
+  S.daily.best = Math.max(S.daily.best, S.daily.streak);
+  write(K.daily, S.daily);
 }
 
 /* CORRECTIF 1 — les options sont réellement remélangées à chaque partie.
@@ -501,7 +556,7 @@ function startPack(id){
 
 function startDaily(){
   /* 5 questions, tirées de façon stable pour la journée en cours. */
-  const day = new Date().toISOString().slice(0,10);
+  const day = todayKey();
   let seed = 0; for(const ch of day) seed = (seed * 31 + ch.charCodeAt(0)) % 100000;
   const sorted = QUESTIONS.slice().sort((a,b) => a.i.localeCompare(b.i));
   const picked = [];
@@ -555,7 +610,10 @@ function validate(){
 }
 
 function next(){
-  if(S.idx >= S.queue.length - 1) return go("results");
+  if(S.idx >= S.queue.length - 1){
+    if(S.pack && S.pack.id === "daily") registerDaily();
+    return go("results");
+  }
   S.idx++; S.picked = []; S.done = false; S.ok = false;
   render();
   window.scrollTo({top:0,behavior:"instant"});
@@ -569,11 +627,99 @@ function resetAll(){
   go("home");
 }
 
+/* ---------- partage d'une carte ------------------------------------------
+   Rend la carte en PNG 1080x1350 (format story) et passe par le partage
+   natif du téléphone. Repli sur un téléchargement si l'appareil ne sait pas. */
+function wrapText(ctx, text, maxWidth){
+  const words = String(text).split(" ");
+  const lines = []; let line = "";
+  for(const w of words){
+    const test = line ? line + " " + w : w;
+    if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line = w; }
+    else line = test;
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+
+function drawLogo(ctx, cx, cy, r, w){
+  const g = ctx.createLinearGradient(cx-r, cy-r, cx+r*0.3, cy+r);
+  g.addColorStop(0, "#A472FF"); g.addColorStop(0.55, "#7B2FF7"); g.addColorStop(1, "#2FE0C8");
+  ctx.strokeStyle = g; ctx.lineWidth = w; ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, (83/180)*Math.PI, (7/180)*Math.PI + 2*Math.PI);
+  ctx.stroke();
+  const a = Math.PI/4;
+  ctx.strokeStyle = "#E8B84B";
+  ctx.beginPath();
+  ctx.moveTo(cx + r*0.68*Math.cos(a), cy + r*0.68*Math.sin(a));
+  ctx.lineTo(cx + r*1.5*Math.cos(a),  cy + r*1.5*Math.sin(a));
+  ctx.stroke();
+}
+
+function shareCard(index){
+  const c = S.cards[index];
+  if(!c) return;
+  const W = 1080, H = 1350;
+  const cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const x = cv.getContext("2d");
+
+  const bg = x.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, "#150a2b"); bg.addColorStop(0.55, "#0b0616"); bg.addColorStop(1, "#05030a");
+  x.fillStyle = bg; x.fillRect(0, 0, W, H);
+
+  x.strokeStyle = "rgba(232,184,75,.55)"; x.lineWidth = 4;
+  x.strokeRect(52, 52, W-104, H-104);
+
+  x.textAlign = "center";
+  x.fillStyle = "#2FE0C8";
+  x.font = "600 26px 'Instrument Sans', system-ui, sans-serif";
+  x.fillText("CARTE CULTURELLE", W/2, 190);
+
+  x.font = "82px system-ui, sans-serif";
+  x.fillText(c.emoji || "✦", W/2, 330);
+
+  x.fillStyle = "#F4EFFF";
+  x.font = "800 76px 'Bricolage Grotesque', system-ui, sans-serif";
+  wrapText(x, c.title, W-220).slice(0,3).forEach((l,i) => x.fillText(l, W/2, 470 + i*88));
+
+  x.fillStyle = "#B4A8D4";
+  x.font = "400 34px 'Instrument Sans', system-ui, sans-serif";
+  wrapText(x, c.text, W-240).slice(0,7).forEach((l,i) => x.fillText(l, W/2, 760 + i*52));
+
+  x.fillStyle = "#E8B84B";
+  x.font = "700 26px 'Space Mono', monospace";
+  x.fillText(String(c.from || "Culture").toUpperCase(), W/2, H-250);
+
+  drawLogo(x, W/2, H-165, 34, 11);
+
+  x.fillStyle = "#7A6F95";
+  x.font = "700 22px 'Space Mono', monospace";
+  x.fillText("KIZOMBA URBAN QUIZ  ·  BY KIZFLOW STUDIO", W/2, H-92);
+
+  cv.toBlob(async blob => {
+    if(!blob) return toast("Image impossible à générer.");
+    const file = new File([blob], "kizomba-urban-quiz.png", {type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try { await navigator.share({files:[file], title:c.title}); return; }
+      catch(err){ if(err && err.name === "AbortError") return; }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "kizomba-urban-quiz.png"; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    toast("Carte enregistrée dans tes téléchargements.");
+  }, "image/png");
+}
+
 /* ---------- écrans -------------------------------------------------------- */
 function viewHome(){
   const lv = levelOf(S.xp), nx = nextLevelOf(S.xp);
   const pct = nx ? Math.min(100, Math.round(100 * (S.xp - lv.min) / (nx.min - lv.min))) : 100;
   const open = PACKS.filter(p => S.xp >= p.unlock).length;
+  const doneToday = S.daily.last === todayKey();
+  const streak = S.daily.streak;
   return `
   <section class="hero">
     <h1><em>Quiz</em>Kizomba<br>Urban</h1>
@@ -583,7 +729,8 @@ function viewHome(){
       <span class="tempo-track"></span>
       <span class="tempo-lbl">1·2·3·4</span>
     </div>
-    <button class="btn gold" data-act="daily">☀️ Quiz du jour — 5 questions</button>
+    <button class="btn gold" data-act="daily">${doneToday ? "☀️ Quiz du jour — refaire" : "☀️ Quiz du jour — 5 questions"}</button>
+    ${streak > 0 ? `<p class="streak">${doneToday ? "✓ Fait aujourd'hui" : "À faire aujourd'hui"} · série de <b>${streak}</b> jour${streak>1?"s":""}${S.daily.best>streak?` · record ${S.daily.best}`:""}</p>` : ""}
     <div class="btn-row"><button class="btn ghost" data-act="packs">Choisir un pack</button></div>
   </section>
 
@@ -601,7 +748,7 @@ function viewHome(){
   <div class="stat-row">
     <div class="stat"><b>${S.seen.length}</b><span>Maîtrisées</span></div>
     <div class="stat"><b>${S.cards.length}</b><span>Cartes</span></div>
-    <div class="stat"><b>${open}/${PACKS.length}</b><span>Packs</span></div>
+    <div class="stat"><b>${badgesOf().length}</b><span>Badges</span></div>
   </div>
   <p class="sig">by KizFlow Studio</p>`;
 }
@@ -690,12 +837,13 @@ function viewResults(){
   </div>`;
 }
 
-function ccard(c){
+function ccard(c, index){
   return `<article class="ccard">
     <div class="emo">${c.emoji||"✦"}</div>
     <h3>${esc(c.title)}</h3>
     <p>${esc(String(c.text).slice(0,96))}${String(c.text).length>96?"…":""}</p>
     <div class="from">${esc(c.from||"Culture")}</div>
+    ${index === undefined ? "" : `<button class="share-btn" data-share="${index}" aria-label="Partager la carte ${esc(c.title)}">↗</button>`}
   </article>`;
 }
 
@@ -705,9 +853,19 @@ function viewCards(){
     <div class="empty"><span>✦</span>Aucune carte pour l'instant.<br>Chaque bonne réponse inédite en débloque une.</div>
     <div class="btn-row"><button class="btn" data-act="packs">Commencer</button></div>`;
   }
+  const badges = badgesOf();
   return `<p class="eyebrow">${S.cards.length} carte${S.cards.length>1?"s":""} débloquée${S.cards.length>1?"s":""}</p>
-  <h2 style="margin-bottom:14px">Mes cartes</h2>
-  <div class="cards-grid">${S.cards.map(c => ccard(c)).join("")}</div>
+  <h2 style="margin-bottom:14px">Ma collection</h2>
+
+  <div class="panel">
+    <p class="eyebrow" style="margin-bottom:10px">Badges de maîtrise</p>
+    ${badges.length
+      ? `<div class="badge-row">${badges.map(b => `<span class="badge ${b.tier.min===100?"gold":""}">
+            <b>${b.tier.emoji}</b>${esc(b.pack.title)}<i>${b.tier.label}</i></span>`).join("")}</div>`
+      : `<p style="font-size:13px;margin:0">Aucun badge pour l'instant. Réponds juste à la moitié des questions d'un pack pour décrocher le premier.</p>`}
+  </div>
+
+  <div class="cards-grid">${S.cards.map((c,i) => ccard(c,i)).join("")}</div>
   <div class="btn-row"><button class="btn danger" data-act="reset">Remettre la progression à zéro</button></div>`;
 }
 
@@ -753,6 +911,8 @@ document.getElementById("view").addEventListener("click", e => {
   if(opt) return pick(Number(opt.dataset.opt));
   const pk = e.target.closest("[data-pack]");
   if(pk) return startPack(pk.dataset.pack);
+  const sh = e.target.closest("[data-share]");
+  if(sh) return shareCard(Number(sh.dataset.share));
   const act = e.target.closest("[data-act]");
   if(!act) return;
   const a = act.dataset.act;
