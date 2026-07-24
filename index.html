@@ -125,10 +125,22 @@ p{margin:0 0 12px;color:var(--muted)}
   position:relative;border-radius:22px;overflow:hidden;
   padding:26px 20px 22px;margin-bottom:16px;
   background:
+    linear-gradient(180deg,rgba(5,3,10,.28),rgba(5,3,10,.55) 46%,rgba(5,3,10,.90)),
+    url("hero.jpg") center/cover no-repeat,
     linear-gradient(155deg,rgba(123,47,247,.26),rgba(11,6,22,.7) 52%,rgba(47,224,200,.10)),
     var(--ink2);
   border:1px solid var(--line);
 }
+/* Le dégradé passe TOUJOURS avant l'image, et un fond uni ferme la pile :
+   si un JPEG manque, l'écran reste correct au lieu de casser. */
+.skin{position:relative;border-radius:20px;overflow:hidden;padding:18px 16px;margin:0 0 14px}
+.skin h2{margin:0}
+.skin-results{background:
+  linear-gradient(180deg,rgba(5,3,10,.40),rgba(5,3,10,.80) 70%,rgba(5,3,10,.94)),
+  url("bg-resultat.jpg") center/cover no-repeat, var(--ink2)}
+.skin-cards{background:
+  linear-gradient(180deg,rgba(5,3,10,.46),rgba(5,3,10,.82) 70%,rgba(5,3,10,.94)),
+  url("bg-cartes.jpg") center/cover no-repeat, var(--ink2)}
 .hero h1{margin-bottom:10px}
 .hero h1 em{font-style:normal;display:block;color:var(--gold);font-size:.55em;letter-spacing:.32em;font-weight:700;margin-bottom:6px}
 .hero p{margin-bottom:18px;font-size:14px;max-width:34ch}
@@ -808,7 +820,9 @@ function viewQuiz(){
 function viewResults(){
   const pct = Math.round(100 * S.score / Math.max(1,S.queue.length));
   return `
-  <p class="eyebrow">${S.pack.emoji} ${S.pack.title}</p>
+  <div class="skin skin-results">
+    <p class="eyebrow">${S.pack.emoji} ${S.pack.title}</p>
+  </div>
   <div class="score-ring" style="--pct:${pct}%"><div><b>${S.score}<span style="font-size:17px;color:var(--muted)">/${S.queue.length}</span></b><span>Score</span></div></div>
 
   <div class="stat-row">
@@ -855,7 +869,7 @@ function viewCards(){
   }
   const badges = badgesOf();
   return `<p class="eyebrow">${S.cards.length} carte${S.cards.length>1?"s":""} débloquée${S.cards.length>1?"s":""}</p>
-  <h2 style="margin-bottom:14px">Ma collection</h2>
+  <div class="skin skin-cards"><h2>Ma collection</h2></div>
 
   <div class="panel">
     <p class="eyebrow" style="margin-bottom:10px">Badges de maîtrise</p>
