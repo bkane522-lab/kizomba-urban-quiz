@@ -145,11 +145,14 @@ p{margin:0 0 12px;color:var(--muted)}
    si un JPEG manque, l'écran reste correct au lieu de casser. */
 .skin{position:relative;border-radius:20px;overflow:hidden;padding:18px 16px;margin:0 0 14px}
 .skin h2{margin:0}
-.skin-results{background:
-  linear-gradient(180deg,rgba(5,3,10,.40),rgba(5,3,10,.80) 70%,rgba(5,3,10,.94)),
-  url("bg-resultat.jpg") center/cover no-repeat, var(--ink2)}
+.skin-results{
+  padding:20px 16px 8px;
+  background:
+    linear-gradient(180deg,rgba(5,3,10,.30),rgba(5,3,10,.60) 70%,rgba(5,3,10,.72)),
+    url("bg-resultat.jpg") center/cover no-repeat, var(--ink2)}
+.skin-results .score-ring{margin:4px auto 10px}
 .skin-cards{background:
-  linear-gradient(180deg,rgba(5,3,10,.46),rgba(5,3,10,.82) 70%,rgba(5,3,10,.94)),
+  linear-gradient(180deg,rgba(5,3,10,.12),rgba(5,3,10,.35) 70%,rgba(5,3,10,.45)),
   url("bg-cartes.jpg") center/cover no-repeat, var(--ink2)}
 .hero h1{margin-bottom:10px}
 .hero h1 em{font-style:normal;display:block;color:var(--gold);font-size:.55em;letter-spacing:.32em;font-weight:700;margin-bottom:6px}
@@ -211,11 +214,27 @@ p{margin:0 0 12px;color:var(--muted)}
 /* ---------- packs ---------- */
 .pack{
   display:block;width:100%;text-align:left;position:relative;
-  background:var(--ink2);border:1px solid var(--line);border-radius:18px;
+  /* Un seul bandeau, désaturé, teinté différemment pour chaque pack.
+     Le voile va de 95 % à gauche (le texte) à 50 % à droite (la lueur). */
+  background:
+    linear-gradient(90deg,rgba(5,3,10,.95) 20%,rgba(5,3,10,.72) 68%,rgba(5,3,10,.50) 100%),
+    linear-gradient(90deg,transparent 42%,var(--tint,rgba(123,47,247,.55)) 100%),
+    url("pack-bg.jpg") center/cover no-repeat,
+    var(--ink2);
+  border:1px solid var(--line);border-radius:18px;
   padding:15px 15px 15px 60px;margin-bottom:10px;overflow:hidden;
   transition:border-color .2s;
 }
 .pack:active{border-color:rgba(164,114,255,.45)}
+.pack[data-pack="decouverte"]{--tint:rgba(123,47,247,.55)}
+.pack[data-pack="sensation"]{--tint:rgba(225,29,72,.55)}
+.pack[data-pack="culture"]{--tint:rgba(232,184,75,.55)}
+.pack[data-pack="dj"]{--tint:rgba(47,224,200,.55)}
+.pack[data-pack="expert"]{--tint:rgba(164,114,255,.55)}
+.pack[data-pack="mindset"]{--tint:rgba(76,110,245,.55)}
+.pack[data-pack="evokeez"]{--tint:rgba(20,200,160,.55)}
+.pack[data-pack="pionniers"]{--tint:rgba(201,138,46,.55)}
+.pack[data-pack="galactic"]{--tint:rgba(147,51,234,.55)}
 .pack .emo{position:absolute;left:15px;top:15px;font-size:26px;line-height:1}
 .pack .ttl{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .pack h3{font-size:16px}
@@ -835,8 +854,8 @@ function viewResults(){
   return `
   <div class="skin skin-results">
     <p class="eyebrow">${S.pack.emoji} ${S.pack.title}</p>
+    <div class="score-ring" style="--pct:${pct}%"><div><b>${S.score}<span style="font-size:17px;color:var(--muted)">/${S.queue.length}</span></b><span>Score</span></div></div>
   </div>
-  <div class="score-ring" style="--pct:${pct}%"><div><b>${S.score}<span style="font-size:17px;color:var(--muted)">/${S.queue.length}</span></b><span>Score</span></div></div>
 
   <div class="stat-row">
     <div class="stat"><b>+${S.gained}</b><span>XP gagnés</span></div>
@@ -881,8 +900,11 @@ function viewCards(){
     <div class="btn-row"><button class="btn" data-act="packs">Commencer</button></div>`;
   }
   const badges = badgesOf();
-  return `<p class="eyebrow">${S.cards.length} carte${S.cards.length>1?"s":""} débloquée${S.cards.length>1?"s":""}</p>
-  <div class="skin skin-cards"><h2>Ma collection</h2></div>
+  return `
+  <div class="skin skin-cards">
+    <p class="eyebrow">${S.cards.length} carte${S.cards.length>1?"s":""} débloquée${S.cards.length>1?"s":""}</p>
+    <h2>Ma collection</h2>
+  </div>
 
   <div class="panel">
     <p class="eyebrow" style="margin-bottom:10px">Badges de maîtrise</p>
