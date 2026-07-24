@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Kizomba Urban Quiz</title>
+<meta name="description" content="Quiz culture Kizomba, Urban Kiz, Semba, Tarraxo, Tarraxinha et Ghetto Zouk." />
+<meta name="theme-color" content="#05030a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Kizomba Urban Quiz" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400;12..96,75..100,700;12..96,75..100,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#05030a; --ink2:#0b0616; --ink3:#130c22;
+  --violet:#7B2FF7; --violet-soft:#A472FF;
+  --gold:#E8B84B; --turq:#2FE0C8; --rasp:#E11D48;
+  --paper:#F4EFFF; --muted:#948AB0; --line:rgba(164,114,255,.16);
+  --display:"Bricolage Grotesque",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,sans-serif;
+  --mono:"Space Mono",ui-monospace,monospace;
+  --head-h:60px; --nav-h:62px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink); color:var(--paper);
+  font-family:var(--body); font-size:15px; line-height:1.5;
+  min-height:100vh; min-height:100dvh;
+  overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(120% 70% at 12% -8%, rgba(123,47,247,.30), transparent 62%),
+    radial-gradient(90% 60% at 92% 4%, rgba(232,184,75,.13), transparent 58%),
+    radial-gradient(110% 70% at 50% 108%, rgba(47,224,200,.11), transparent 62%);
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--turq);outline-offset:3px;border-radius:6px}
+
+/* ---------- shell ---------- */
+.shell{
+  position:relative; z-index:1;
+  max-width:520px; margin:0 auto;
+  padding:calc(var(--head-h) + var(--safe-t) + 14px) 18px calc(var(--nav-h) + var(--safe-b) + 26px);
+  min-height:100dvh;
+}
+
+/* ---------- header ---------- */
+.head{
+  position:fixed; top:0; left:0; right:0; z-index:40;
+  height:calc(var(--head-h) + var(--safe-t));
+  padding:var(--safe-t) 16px 0;
+  display:flex; align-items:center; gap:10px;
+  background:linear-gradient(180deg,rgba(5,3,10,.96),rgba(5,3,10,.78) 70%,transparent);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+}
+.mark{
+  width:34px;height:34px;flex:0 0 34px;border-radius:11px;
+  display:grid;place-items:center;
+  background:conic-gradient(from 200deg,var(--violet),var(--rasp),var(--gold),var(--turq),var(--violet));
+  font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:-.5px;
+  color:#0b0616;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 6px 18px rgba(123,47,247,.35);
+}
+.head-id{flex:1;min-width:0}
+.head-id b{
+  display:block;font-family:var(--display);font-weight:800;font-size:14px;
+  letter-spacing:.02em;line-height:1.1;font-stretch:92%;
+}
+.head-id span{display:block;font-size:9.5px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase}
+.xp-chip{
+  display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
+  background:rgba(232,184,75,.10);border:1px solid rgba(232,184,75,.28);
+  font-family:var(--mono);font-size:11.5px;color:var(--gold);white-space:nowrap;
+}
+.snd{
+  width:36px;height:36px;flex:0 0 36px;border-radius:50%;
+  border:1px solid var(--line);background:rgba(255,255,255,.03);
+  display:grid;place-items:center;font-size:14px;
+}
+.snd[aria-pressed="true"]{border-color:rgba(47,224,200,.5);background:rgba(47,224,200,.12)}
+
+/* ---------- nav ---------- */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:40;
+  height:calc(var(--nav-h) + var(--safe-b));
+  padding-bottom:var(--safe-b);
+  display:flex;
+  background:linear-gradient(0deg,rgba(5,3,10,.98) 60%,rgba(5,3,10,.86));
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);
+}
+.nav button{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  padding-top:4px;
+}
+.nav button i{font-style:normal;font-size:17px;line-height:1;opacity:.62;transition:.2s}
+.nav button[aria-current="page"]{color:var(--paper)}
+.nav button[aria-current="page"] i{opacity:1;transform:translateY(-1px)}
+.nav button[aria-current="page"]::after{
+  content:"";position:absolute;top:0;width:26px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--violet),var(--turq));
+}
+.nav button{position:relative}
+
+/* ---------- type ---------- */
+.eyebrow{
+  font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--violet-soft);
+  margin:0 0 8px;font-weight:600;
+}
+h1,h2,h3{font-family:var(--display);margin:0;font-weight:800;letter-spacing:-.02em}
+h1{font-size:clamp(30px,9vw,40px);line-height:.98;font-stretch:88%}
+h2{font-size:20px;line-height:1.12}
+h3{font-size:15px;line-height:1.2;font-weight:700}
+p{margin:0 0 12px;color:var(--muted)}
+.num{font-family:var(--mono)}
+
+/* ---------- hero : ligne de tempo ---------- */
+.hero{
+  position:relative;border-radius:22px;overflow:hidden;
+  padding:26px 20px 22px;margin-bottom:16px;
+  background:
+    linear-gradient(155deg,rgba(123,47,247,.26),rgba(11,6,22,.7) 52%,rgba(47,224,200,.10)),
+    var(--ink2);
+  border:1px solid var(--line);
+}
+.hero h1{margin-bottom:10px}
+.hero h1 em{font-style:normal;display:block;color:var(--gold);font-size:.55em;letter-spacing:.32em;font-weight:700;margin-bottom:6px}
+.hero p{margin-bottom:18px;font-size:14px;max-width:34ch}
+.tempo{display:flex;align-items:center;gap:9px;margin-bottom:20px}
+.tempo-track{
+  position:relative;flex:1;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,rgba(164,114,255,.35),rgba(47,224,200,.22));
+  overflow:hidden;
+}
+.tempo-track::after{
+  content:"";position:absolute;top:-2px;left:0;width:34px;height:6px;border-radius:6px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  animation:sweep 2.82s linear infinite; /* ~85 bpm, 4 temps */
+}
+.tempo-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.1em}
+@keyframes sweep{from{transform:translateX(-40px)}to{transform:translateX(520px)}}
+
+/* ---------- niveau ---------- */
+.level-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.level-badge{
+  width:44px;height:44px;flex:0 0 44px;border-radius:14px;display:grid;place-items:center;
+  font-size:20px;background:rgba(232,184,75,.10);border:1px solid rgba(232,184,75,.3);
+}
+.level-name{font-family:var(--display);font-weight:800;font-size:17px;line-height:1.1}
+.level-next{font-size:11.5px;color:var(--muted)}
+.bar{height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--violet),var(--gold));transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- boutons ---------- */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  min-height:52px;border-radius:14px;font-weight:600;font-size:15px;
+  background:linear-gradient(100deg,var(--violet),#5B18C9);
+  box-shadow:0 8px 22px rgba(123,47,247,.32);
+  transition:transform .12s ease;
+}
+.btn:active{transform:scale(.985)}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);box-shadow:none;color:var(--paper)}
+.btn.gold{background:linear-gradient(100deg,var(--gold),#C99527);color:#22160a;box-shadow:0 8px 22px rgba(232,184,75,.24)}
+.btn.danger{background:none;border:1px solid rgba(225,29,72,.4);color:#FF8FA6;box-shadow:none;min-height:46px;font-size:13.5px}
+.btn[disabled]{opacity:.42;pointer-events:none}
+.btn-row{display:flex;gap:10px;margin-top:10px}
+.btn-row .btn{margin:0}
+
+/* ---------- cartes générales ---------- */
+.panel{
+  background:var(--ink2);border:1px solid var(--line);border-radius:18px;
+  padding:16px;margin-bottom:12px;
+}
+.stat-row{display:flex;gap:9px;margin-bottom:16px}
+.stat{
+  flex:1;background:var(--ink2);border:1px solid var(--line);border-radius:14px;
+  padding:12px 10px;text-align:center;
+}
+.stat b{display:block;font-family:var(--mono);font-size:19px;color:var(--gold);line-height:1.1}
+.stat span{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- packs ---------- */
+.pack{
+  display:block;width:100%;text-align:left;position:relative;
+  background:var(--ink2);border:1px solid var(--line);border-radius:18px;
+  padding:15px 15px 15px 60px;margin-bottom:10px;overflow:hidden;
+  transition:border-color .2s;
+}
+.pack:active{border-color:rgba(164,114,255,.45)}
+.pack .emo{position:absolute;left:15px;top:15px;font-size:26px;line-height:1}
+.pack .ttl{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pack h3{font-size:16px}
+.pack .lvl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--violet-soft)}
+.pack p{font-size:12.5px;margin:5px 0 8px;line-height:1.4}
+.pack .meta{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.pack .mastery{margin-left:auto;color:var(--gold)}
+.pack.locked{opacity:.5}
+.pack.locked .meta{color:var(--rasp)}
+.pack.done{border-color:rgba(232,184,75,.4)}
+
+/* ---------- décompte de temps (signature) ---------- */
+.count{
+  display:flex;align-items:flex-end;gap:5px;height:22px;margin-bottom:6px;
+}
+.count b{
+  flex:1;height:4px;border-radius:3px;background:rgba(255,255,255,.10);
+  transition:height .25s ease,background .25s ease;
+}
+.count b.past{background:linear-gradient(90deg,var(--violet),var(--violet-soft))}
+.count b.now{height:16px;background:var(--gold);box-shadow:0 0 12px rgba(232,184,75,.55)}
+.count-lbl{
+  display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+  color:var(--muted);letter-spacing:.08em;margin-bottom:18px;
+}
+
+/* ---------- quiz ---------- */
+.q-mod{
+  display:inline-block;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--turq);border:1px solid rgba(47,224,200,.3);border-radius:999px;
+  padding:4px 10px;margin-bottom:12px;
+}
+.q-text{font-family:var(--display);font-weight:700;font-size:20px;line-height:1.24;margin-bottom:6px;letter-spacing:-.01em}
+.q-hint{font-size:11.5px;color:var(--gold);margin-bottom:14px}
+.opt{
+  display:flex;align-items:flex-start;gap:11px;width:100%;text-align:left;
+  background:var(--ink2);border:1px solid var(--line);border-radius:14px;
+  padding:13px 14px;margin-bottom:9px;min-height:52px;line-height:1.35;
+  transition:border-color .16s,background .16s;
+}
+.opt .tick{
+  flex:0 0 20px;width:20px;height:20px;border-radius:7px;margin-top:1px;
+  border:1.5px solid rgba(164,114,255,.4);display:grid;place-items:center;
+  font-size:11px;color:transparent;transition:.16s;
+}
+.opt.sel{border-color:var(--violet-soft);background:rgba(123,47,247,.14)}
+.opt.sel .tick{background:var(--violet);border-color:var(--violet);color:#fff}
+.opt.right{border-color:var(--turq);background:rgba(47,224,200,.13)}
+.opt.right .tick{background:var(--turq);border-color:var(--turq);color:#04231e}
+.opt.wrong{border-color:var(--rasp);background:rgba(225,29,72,.12)}
+.opt.wrong .tick{background:var(--rasp);border-color:var(--rasp);color:#fff}
+.opt[disabled]{pointer-events:none}
+.explain{
+  border-radius:14px;padding:14px;margin:12px 0 4px;
+  background:rgba(232,184,75,.07);border:1px solid rgba(232,184,75,.24);
+  font-size:13.5px;line-height:1.5;
+}
+.explain b{display:block;font-family:var(--display);font-size:13px;margin-bottom:5px;letter-spacing:.02em}
+.explain.ko{background:rgba(225,29,72,.07);border-color:rgba(225,29,72,.26)}
+
+/* ---------- cartes culturelles ---------- */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ccard{
+  position:relative;border-radius:14px;padding:13px;min-height:112px;
+  background:linear-gradient(165deg,rgba(123,47,247,.20),var(--ink2) 60%);
+  border:1px solid rgba(232,184,75,.34);
+  display:flex;flex-direction:column;
+}
+.ccard .emo{font-size:19px;margin-bottom:6px}
+.ccard h3{font-size:13.5px;margin-bottom:5px}
+.ccard p{font-size:10.5px;line-height:1.4;margin:0;color:var(--muted)}
+.ccard .from{margin-top:auto;padding-top:7px;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase}
+.empty{
+  text-align:center;padding:38px 20px;border:1px dashed var(--line);border-radius:18px;color:var(--muted);
+}
+.empty span{display:block;font-size:34px;margin-bottom:10px;opacity:.5}
+
+/* ---------- résultats ---------- */
+.score-ring{
+  width:132px;height:132px;margin:6px auto 16px;border-radius:50%;
+  display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--gold) var(--pct,0%),rgba(255,255,255,.07) 0);
+}
+.score-ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--ink2)}
+.score-ring div{position:relative;text-align:center}
+.score-ring b{display:block;font-family:var(--mono);font-size:34px;line-height:1;color:var(--gold)}
+.score-ring span{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.recap{border-top:1px solid var(--line);padding:11px 0;display:flex;gap:10px;align-items:flex-start;font-size:13px}
+.recap .dot{flex:0 0 8px;width:8px;height:8px;border-radius:50%;margin-top:6px}
+.recap .dot.ok{background:var(--turq)} .recap .dot.ko{background:var(--rasp)}
+.recap p{margin:3px 0 0;font-size:11.5px;color:var(--muted)}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(var(--nav-h) + var(--safe-b) + 14px);z-index:60;
+  max-width:88%;padding:11px 16px;border-radius:12px;font-size:13px;text-align:center;
+  background:rgba(19,12,34,.97);border:1px solid rgba(164,114,255,.4);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.sig{text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--muted);
+     text-transform:uppercase;margin:22px 0 0;opacity:.6}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .tempo-track::after{display:none}
+}
+@media (max-width:340px){
+  .shell{padding-left:14px;padding-right:14px}
+  h1{font-size:27px}
+  .cards-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="mark">KQ</div>
+  <div class="head-id">
+    <b>Kizomba Urban</b>
+    <span>Quiz</span>
+  </div>
+  <div class="xp-chip"><span id="lvlEmo">🌱</span><span class="num" id="xpVal">0</span> XP</div>
+  <button class="snd" id="sndBtn" aria-pressed="false" aria-label="Activer le son d'ambiance">♪</button>
+</header>
+
+<main class="shell" id="view"></main>
+
+<nav class="nav" id="nav">
+  <button data-go="home"><i>◆</i>Accueil</button>
+  <button data-go="packs"><i>▤</i>Packs</button>
+  <button data-go="cards"><i>✦</i>Cartes</button>
+  <button data-go="infos"><i>≡</i>Culture</button>
+</nav>
+
+<audio id="amb" src="kizomba-loop.mp3" loop preload="none"></audio>
+
+<script>
+/* ==========================================================================
+   Kizomba Urban Quiz — by KizFlow Studio
+   Fichier unique, sans build. Les 6 anomalies de l'audit sont corrigées ici :
+   1. mélange réel des réponses à chaque partie   4. sessionSize borné au stock
+   2. 100dvh + safe-area iPhone                   5. XP non farmable
+   3. localStorage protégé par try/catch          6. audio en chemin relatif
+   ========================================================================== */
+
+const QUESTIONS = [{"i":"q274","p":"decouverte","m":"Bases","t":"multi","q":"Quels éléments sont importants dans la Kizomba ?","o":["Sauts acrobatiques obligatoires","Connexion","Musicalité","Transfert de poids"],"c":[1,2,3],"k":"Bases Kizomba","e":"La Kizomba demande connexion, musicalité et gestion du poids."},{"i":"q275","p":"decouverte","m":"Styles","t":"multi","q":"Quels mots peuvent être liés au Semba ?","o":["Fête","Énergie","Silence total","Angola"],"c":[0,1,3],"k":"Semba vivant","e":"Le Semba est festif, expressif et lié à l’Angola."},{"i":"q276","p":"decouverte","m":"Styles","t":"multi","q":"Quels styles ou univers apparaissent souvent dans une soirée Kizomba moderne ?","o":["Kizomba","Semba","Urban Kiz","Ghetto Zouk"],"c":[0,1,2,3],"k":"Soirée moderne","e":"Une soirée moderne peut mélanger plusieurs univers selon le public."},{"i":"q277","p":"decouverte","m":"Premiers pièges","t":"multi","q":"Quels éléments sont plutôt des musiques ou univers musicaux ?","o":["Ghetto Zouk","Guidage","Cabo Love","Pop Palop"],"c":[0,2,3],"k":"Univers musicaux","e":"Ghetto Zouk, Cabo Love et Pop Palop sont des univers musicaux."},{"i":"q278","p":"sensation","m":"Douceur","t":"multi","q":"Quels éléments sont importants dans la douceur ?","o":["Brutalité","Écoute","Contrôle","Respect du partenaire"],"c":[1,2,3],"k":"Douceur avancée","e":"La douceur demande présence, contrôle et respect."},{"i":"q279","p":"sensation","m":"Tarraxinha","t":"multi","q":"Quels éléments sont liés à la Tarraxinha ?","o":["Micro-mouvements","Isolations","Course rapide","Bassin"],"c":[0,1,3],"k":"Tarraxinha technique","e":"La Tarraxinha se concentre souvent sur les isolations et les micro-mouvements."},{"i":"q280","p":"sensation","m":"Flow","t":"multi","q":"Le flow peut naître de…","o":["La musique","Le ressenti","La dynamique","L’absence d’écoute"],"c":[0,1,2],"k":"Flow","e":"Le flow relie musique, corps, ressenti et intention."},{"i":"q281","p":"sensation","m":"Tarraxo","t":"multi","q":"Quels mots peuvent correspondre au Tarraxo ?","o":["Basses profondes","Silence total","Intensité","Contrôle"],"c":[0,2,3],"k":"Tarraxo","e":"Le Tarraxo est souvent lié à des sons lourds et à une énergie contrôlée."},{"i":"q282","p":"sensation","m":"Contrôle","t":"multi","q":"Quels éléments aident à danser sans brutalité ?","o":["Force imposée","Contrôle","Respiration","Écoute"],"c":[1,2,3],"k":"Danser propre","e":"Une danse propre demande écoute, respiration et contrôle."},{"i":"q283","p":"culture","m":"Racines","t":"multi","q":"Quels univers ont nourri les musiques liées à la Kizomba ?","o":["Semba","Zouk","Silence total","Cabo Love"],"c":[0,1,3],"k":"Racines musicales","e":"La Kizomba et ses voisins sont nourris par plusieurs influences afro-lusophones et afro-caribéennes."},{"i":"q284","p":"culture","m":"Artistes","t":"multi","q":"Quels artistes sont liés aux univers Kizomba / Ghetto Zouk / Pop Palop ?","o":["Nelson Freitas","Anselmo Ralph","C4 Pedro","Beethoven uniquement"],"c":[0,1,2],"k":"Artistes afro-lusophones","e":"Ces artistes font partie des noms importants dans ces univers musicaux."},{"i":"q285","p":"culture","m":"PALOP","t":"multi","q":"Quels mots sont liés à la culture afro-lusophone ?","o":["Angola","Antarctique","Cap-Vert","Portugal"],"c":[0,2,3],"k":"Afro-lusophone","e":"L’univers afro-lusophone relie notamment Angola, Cap-Vert, Portugal et diasporas."},{"i":"q286","p":"culture","m":"Nuances","t":"multi","q":"Quelles formulations sont bonnes pour éviter les polémiques ?","o":["La seule vérité est","Souvent présenté comme","Selon certaines écoles","Dans certaines scènes"],"c":[1,2,3],"k":"Nuance éditoriale","e":"Certains sujets sont débattus : il faut transmettre avec nuance."},{"i":"q287","p":"dj","m":"Lecture de piste","t":"multi","q":"Quels éléments un DJ doit observer sur la piste ?","o":["L’énergie","La fatigue","La couleur des chaussures uniquement","Le niveau des danseurs"],"c":[0,1,3],"k":"Lecture de piste","e":"Un DJ adapte son set à l’ambiance réelle de la salle."},{"i":"q288","p":"dj","m":"Énergie","t":"multi","q":"Le DJ doit adapter son set selon…","o":["Le public","L’énergie","Le moment de la soirée","Rien du tout"],"c":[0,1,2],"k":"Adaptation DJ","e":"Un DJ attentif adapte son choix musical au contexte réel."},{"i":"q289","p":"dj","m":"Styles","t":"multi","q":"Quels styles peuvent aider à faire respirer une soirée ?","o":["Semba","Tarraxo intense non-stop","Kizomba douce","Ghetto Zouk bien placé"],"c":[0,2,3],"k":"Respiration de soirée","e":"Une soirée équilibrée alterne douceur, énergie et respiration."},{"i":"q290","p":"dj","m":"Transitions","t":"multi","q":"Une bonne transition doit être…","o":["Complètement hasardeuse","Cohérente","Fluide","Adaptée à l’énergie"],"c":[1,2,3],"k":"Transition DJ","e":"La transition garde les danseurs dans le voyage."},{"i":"q291","p":"expert","m":"Urban Kiz","t":"multi","q":"Quels éléments peuvent influencer l’Urban Kiz ?","o":["Kizomba","Ghetto Zouk","R&B / Hip-Hop","Musiques électroniques"],"c":[0,1,2,3],"k":"Influences Urban Kiz","e":"L’Urban Kiz est un style moderne nourri par plusieurs influences."},{"i":"q292","p":"expert","m":"Technique","t":"multi","q":"Quels éléments sont liés au Tetris Style comme approche pédagogique ?","o":["Cadre","Guidage précis","Transferts de poids","Flou permanent"],"c":[0,1,2],"k":"Tetris Style","e":"Le Tetris Style est une image de précision et d’architecture du mouvement."},{"i":"q293","p":"expert","m":"Nuances","t":"multi","q":"Quels éléments rendent une question plus Expert ?","o":["Nuance culturelle","Réponse évidente sans réflexion","Comparaison entre styles","Piège musique vs danse"],"c":[0,2,3],"k":"Niveau Expert","e":"Une question Expert oblige à comprendre, pas seulement mémoriser."},{"i":"q294","p":"expert","m":"Débats","t":"multi","q":"Quels sujets doivent être présentés avec prudence ?","o":["La nécessité du respect","Origines exactes","Créateur unique","Différences Urban Kiz/Kizomba"],"c":[1,2,3],"k":"Prudence Expert","e":"Certains sujets varient selon les scènes, les sources et les témoignages."},{"i":"q295","p":"mindset","m":"Respect","t":"multi","q":"Quels comportements montrent un bon mindset ?","o":["Écouter son partenaire","Respecter les limites","Se moquer des débutants","Rester humble"],"c":[0,1,3],"k":"Mindset danseur","e":"Le niveau technique ne vaut rien sans respect et humilité."},{"i":"q296","p":"mindset","m":"Musicalité","t":"multi","q":"Danser la musique signifie écouter…","o":["Les silences","Les voix","Les basses","Les émotions"],"c":[0,1,2,3],"k":"Musicalité incarnée","e":"La musicalité donne du sens au mouvement."},{"i":"q297","p":"mindset","m":"Transmission","t":"multi","q":"Quels éléments appartiennent à une bonne transmission ?","o":["Méthode","Mépris","Culture","Responsabilité"],"c":[0,2,3],"k":"Transmission complète","e":"Transmettre, c’est donner du contenu, une méthode et une conscience."},{"i":"q298","p":"mindset","m":"Respect","t":"multi","q":"La proximité demande surtout…","o":["Obligation","Respect","Écoute","Consentement"],"c":[1,2,3],"k":"Proximité respectueuse","e":"Plus une danse est proche, plus le respect doit être clair."},{"i":"q299","p":"evokeez","m":"LCM","t":"multi","q":"Quels piliers peuvent aider un danseur à progresser durablement ?","o":["Musicalité","Créativité","Brutalité","Légèreté"],"c":[0,1,3],"k":"LCM","e":"Musicalité, Créativité et Légèreté peuvent structurer une progression consciente."},{"i":"q300","p":"evokeez","m":"Pédagogie","t":"multi","q":"Former des professeurs demande surtout…","o":["Méthode","Culture","Pédagogie","Mindset"],"c":[0,1,2,3],"k":"Formation professeur","e":"Former un professeur, c’est transmettre une responsabilité, pas seulement des pas."},{"i":"q301","p":"evokeez","m":"LCM","t":"multi","q":"Quels éléments vont avec la légèreté ?","o":["Contrôle","Mouvements brusques","Fluidité","Relâchement"],"c":[0,2,3],"k":"Légèreté","e":"La légèreté demande précision, relâchement et maîtrise."},{"i":"q302","p":"evokeez","m":"Créativité","t":"multi","q":"La créativité fonctionne mieux avec…","o":["Le mépris des fondamentaux","Des bases solides","De l’écoute","Une intention"],"c":[1,2,3],"k":"Créativité consciente","e":"La créativité n’efface pas les bases : elle les transforme."},{"i":"q303","p":"pionniers","m":"France","t":"multi","q":"Quels noms sont souvent cités autour de l’Urban Kiz en France ?","o":["Curtis Seldon","Enah Lebon","Mozart","Moun"],"c":[0,1,3],"k":"Pionniers Urban Kiz","e":"Ces noms reviennent souvent dans l’histoire française de l’Urban Kiz."},{"i":"q304","p":"pionniers","m":"DJs","t":"multi","q":"Quels noms sont liés à la scène DJ Kizomba / Ghetto Zouk ?","o":["DJ Elji","DJ Anaïs","DJ Znobia","DJ Silence total"],"c":[0,1,2],"k":"DJs Kizomba","e":"Ces DJs sont associés à des univers importants de la scène."},{"i":"q305","p":"pionniers","m":"Transmission","t":"multi","q":"Quels profils peuvent être des bâtisseurs de culture ?","o":["Professeurs","DJs","Organisateurs","Élèves passionnés"],"c":[0,1,2,3],"k":"Bâtisseurs","e":"Une culture grandit grâce à toute une chaîne de transmission."},{"i":"q306","p":"galactic","m":"Culture","t":"multi","q":"La philosophie de l’app doit transmettre…","o":["Le mépris des styles","Les racines","Les évolutions","Le respect"],"c":[1,2,3],"k":"Mission Galactic","e":"L’app doit être pédagogique, ouverte et respectueuse."},{"i":"q307","p":"galactic","m":"DJ","t":"multi","q":"Quels éléments peuvent faire une soirée mémorable ?","o":["Bon timing","Transitions cohérentes","Volume fort sans logique","Lecture de piste"],"c":[0,1,3],"k":"Soirée mémorable","e":"Un bon set construit des souvenirs par l’énergie, la sélection et le timing."},{"i":"q308","p":"galactic","m":"Débats","t":"multi","q":"Une bonne app culturelle doit éviter…","o":["Les vérités trop fermées","Le mépris","Les affirmations sans nuance","La pédagogie"],"c":[0,1,2],"k":"Esprit critique","e":"La culture demande nuance, précision et respect."},{"i":"q309","p":"galactic","m":"Scénarios","t":"multi","q":"Quels éléments aident à garder les utilisateurs dans l’app ?","o":["Questions variées","Toutes les réponses en A","Cartes culturelles","Packs verrouillés"],"c":[0,2,3],"k":"Rétention","e":"Une app durable mélange progression, collection et variété."},{"i":"q310","p":"decouverte","m":"Premiers pièges","t":"single","q":"Quelle différence est la plus juste ?","o":["Ghetto Zouk = figure de bras","Kizomba = danse sans musique","Kizomba = connexion et marche / Ghetto Zouk = musique","Les deux sont toujours exactement la même chose"],"c":[2],"k":"Différence simple","e":"La Kizomba est une danse et une culture, tandis que le Ghetto Zouk est un univers musical."},{"i":"q311","p":"sensation","m":"Tarraxinha","t":"single","q":"Quelle différence est la plus juste ?","o":["Tarraxinha = course rapide","Tarraxo = silence total","Aucune nuance n’existe","Tarraxinha = lenteur et micro-mouvements / Tarraxo = énergie souvent plus moderne et intense"],"c":[3],"k":"Tarraxo vs Tarraxinha","e":"Les termes varient selon les scènes, mais cette distinction aide à comprendre les usages."},{"i":"q312","p":"culture","m":"Musique vs danse","t":"single","q":"Quelle phrase est la plus juste ?","o":["La musique et la danse sont liées, mais elles peuvent avoir des histoires différentes","La musique et la danse sont toujours la même chose","La danse n’a jamais de culture","La musique n’influence jamais la danse"],"c":[0],"k":"Musique vs danse","e":"C’est une notion centrale pour comprendre Kizomba, Urban Kiz et Ghetto Zouk."},{"i":"q313","p":"dj","m":"Énergie","t":"single","q":"Quelle séquence est la plus logique pour une soirée équilibrée ?","o":["Tarraxo intense dès la première minute uniquement","Warm-up → connexion → montée d’énergie → respiration → intensité selon la piste","Le même son toute la soirée","Silence puis arrêt de soirée"],"c":[1],"k":"Set équilibré","e":"Une bonne soirée respire, monte et redescend."},{"i":"q314","p":"expert","m":"Urban Kiz","t":"single","q":"Quelle définition est la plus équilibrée ?","o":["Urban Kiz = aucune racine","Urban Kiz = toujours exactement Kizomba traditionnelle","Urban Kiz = style moderne influencé par la Kizomba et les musiques urbaines","Urban Kiz = une figure unique"],"c":[2],"k":"Définition équilibrée","e":"Cette formulation respecte à la fois les racines et les évolutions."},{"i":"q315","p":"mindset","m":"Respect","t":"single","q":"Quelle réaction est la plus juste si le partenaire semble mal à l’aise ?","o":["Forcer plus","Ignorer les signaux","Se moquer","Adapter ou arrêter"],"c":[3],"k":"Écoute corporelle","e":"Le confort du partenaire passe avant la figure."},{"i":"q316","p":"evokeez","m":"LCM","t":"single","q":"Quelle phrase résume le mieux Musicalité, Créativité, Légèreté et Mindset ?","o":["Une progression consciente qui relie écoute, expression et état d’esprit","Une méthode pour forcer plus","Une compétition de vitesse","Une danse sans bases"],"c":[0],"k":"LCM","e":"LCM structure une progression consciente et musicale."},{"i":"q317","p":"pionniers","m":"Transmission","t":"single","q":"Quelle phrase est la plus prudente sur Mestre Petchu ?","o":["Le créateur unique de tout","Une grande figure de transmission des danses angolaises","Un DJ de techno","Un personnage fictif"],"c":[1],"k":"Mestre Petchu","e":"Il est plus crédible de parler de figure majeure de transmission."},{"i":"q318","p":"galactic","m":"Débats","t":"single","q":"Quelle phrase correspond le mieux à l’esprit de l’app ?","o":["Dire qu’un seul style mérite d’exister","Supprimer les nuances","Transmettre la culture, les racines et les évolutions sans mépriser les styles","Transformer la culture en ego"],"c":[2],"k":"Philosophie Kizomba Urban Quiz","e":"L’app doit être pédagogique, ouverte et respectueuse."},{"i":"q319","p":"decouverte","m":"Connexion","t":"single","q":"Un débutant veut faire beaucoup de figures dès la première danse. Quelle priorité lui rappeler ?","o":["Forcer les passes","Ignorer le rythme","Danser seulement pour se montrer","Écouter la musique et son partenaire"],"c":[3],"k":"Priorité débutant","e":"La connexion et l’écoute construisent une meilleure danse que l’accumulation de figures."},{"i":"q320","p":"decouverte","m":"Styles","t":"single","q":"Une personne confond Ghetto Zouk et danse. Quelle correction est la plus juste ?","o":["Le Ghetto Zouk est principalement un univers musical","C’est une figure de Semba","C’est une danse traditionnelle cubaine","C’est un pas obligatoire"],"c":[0],"k":"Ghetto Zouk","e":"Cette nuance évite une confusion fréquente."},{"i":"q321","p":"sensation","m":"Douceur","t":"single","q":"Un danseur croit que douceur veut dire absence d’énergie. Que répondre ?","o":["Oui, il ne faut plus bouger","La douceur est une énergie maîtrisée","Il faut guider plus fort","La douceur n’a aucun lien avec la danse"],"c":[1],"k":"Douceur consciente","e":"La douceur demande contrôle, écoute et précision."},{"i":"q322","p":"sensation","m":"Tarraxinha","t":"single","q":"Dans une danse très proche, quel élément devient encore plus important ?","o":["L’obligation de suivre","La force","Le respect du confort et des limites","La vitesse"],"c":[2],"k":"Proximité respectueuse","e":"Plus la danse est proche, plus le respect doit être clair."},{"i":"q323","p":"culture","m":"Nuances","t":"single","q":"Une personne dit : “La Kizomba vient uniquement du Zouk.” Quelle réponse est la plus correcte ?","o":["C’est la seule vérité","Le Semba n’existe pas","La culture n’a aucune importance","C’est trop simplifié : il faut aussi parler de l’Angola, du Semba et des évolutions locales"],"c":[3],"k":"Nuance culturelle","e":"Le Zouk a influencé la musique, mais l’histoire est plus large."},{"i":"q324","p":"culture","m":"Musique vs danse","t":"single","q":"Pourquoi distinguer musique et danse dans l’app ?","o":["Pour éviter de confondre un support musical avec un style dansé","Pour compliquer sans raison","Parce que la danse n’a pas besoin de musique","Parce que tous les styles sont identiques"],"c":[0],"k":"Musique vs danse","e":"Cette distinction rend les questions plus intelligentes."},{"i":"q325","p":"dj","m":"Warm-up","t":"single","q":"Le DJ arrive sur une piste froide. Que doit-il éviter ?","o":["Installer progressivement","Commencer directement par une intensité trop lourde","Observer la salle","Choisir une énergie adaptée"],"c":[1],"k":"Timing DJ","e":"Le warm-up prépare la piste."},{"i":"q326","p":"dj","m":"Lecture de piste","t":"single","q":"La piste fatigue. Quelle décision peut aider ?","o":["Monter encore plus fort sans lire la salle","Ignorer les danseurs","Faire respirer avec une énergie plus joyeuse ou plus douce","Couper toute la musique"],"c":[2],"k":"Respiration DJ","e":"Un DJ doit sentir quand la piste a besoin de respirer."},{"i":"q327","p":"expert","m":"Urban Kiz","t":"single","q":"Pourquoi “Urban Kiz = Kizomba moderne” est trop simplifié ?","o":["Parce que l’Urban Kiz n’a aucune musique","Parce que la Kizomba n’existe pas","Parce qu’il n’y a jamais de nuance","Parce que l’Urban Kiz a ses influences, codes et débats propres"],"c":[3],"k":"Nuance Urban Kiz","e":"La nuance permet de respecter les racines et les évolutions."},{"i":"q328","p":"expert","m":"Technique","t":"single","q":"Un guidage devient flou. Quel élément technique peut aider ?","o":["Clarifier le cadre et le transfert de poids","Tirer plus fort","Accélérer sans écouter","Ignorer le partenaire"],"c":[0],"k":"Guidage précis","e":"Un bon guidage passe par la clarté, pas par la force."},{"i":"q329","p":"mindset","m":"Respect","t":"single","q":"Un partenaire refuse une danse. Quelle réaction est correcte ?","o":["Insister","Respecter le refus simplement","Culpabiliser","Se moquer"],"c":[1],"k":"Consentement","e":"Le droit de refuser fait partie du respect."},{"i":"q330","p":"mindset","m":"Humilité","t":"single","q":"Un danseur avancé se moque des débutants. Quel mindset manque ?","o":["La vitesse","La force","L’humilité","Le bruit"],"c":[2],"k":"Humilité","e":"Le niveau technique ne justifie jamais le mépris."},{"i":"q331","p":"evokeez","m":"Musicalité","t":"single","q":"Un élève connaît des figures mais danse sans écouter. Quel axe travailler ?","o":["Forcer les bras","Ignorer les silences","Faire plus vite","La musicalité"],"c":[3],"k":"Musicalité","e":"La musicalité donne du sens aux figures."},{"i":"q332","p":"evokeez","m":"Légèreté","t":"single","q":"Une danse semble lourde et forcée. Quel pilier peut aider ?","o":["La légèreté","La brutalité","La précipitation","L’ego"],"c":[0],"k":"Légèreté","e":"La légèreté demande contrôle, relâchement et écoute."},{"i":"q333","p":"pionniers","m":"France","t":"single","q":"Une personne découvre l’histoire Urban Kiz en France. Quels noms peuvent apparaître en premier ?","o":["Mozart, Chopin et Bach","Curtis Seldon, Enah Lebon et Moun","Pelé, Maradona et Zidane","Picasso, Van Gogh et Monet"],"c":[1],"k":"Pionniers Urban Kiz","e":"Ces noms sont souvent cités dans l’histoire française de l’Urban Kiz."},{"i":"q334","p":"pionniers","m":"Evokeez","t":"single","q":"Quel duo est associé à l’écosystème Evokeez ?","o":["Deux DJs fictifs","Un groupe de rock","Laurent Yìshù et Sophie Madyson","Une équipe de football"],"c":[2],"k":"Evokeez","e":"Laurent Yìshù et Sophie Madyson développent l’écosystème Evokeez."},{"i":"q335","p":"galactic","m":"Rétention","t":"single","q":"Pourquoi ajouter beaucoup de questions dans l’app ?","o":["Pour rendre toutes les réponses faciles","Pour cacher le contenu","Pour supprimer les packs","Pour éviter que les utilisateurs se lassent trop vite"],"c":[3],"k":"Rétention","e":"Une grande banque de questions rend les sessions plus variées."},{"i":"q336","p":"galactic","m":"Scénarios","t":"single","q":"Que doit faire une bonne question Expert ?","o":["Faire réfléchir avec nuance","Donner toujours la réponse A","Être évidente","Supprimer l’explication"],"c":[0],"k":"Question Expert","e":"Les niveaux élevés doivent devenir plus coriaces mais rester justes."},{"i":"q337","p":"decouverte","m":"Premiers pièges","t":"single","q":"Vrai ou faux : Le Ghetto Zouk est une musique, pas une danse.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Ghetto Zouk","e":"C’est un point essentiel pour éviter la confusion entre musique et danse."},{"i":"q338","p":"decouverte","m":"Premiers pièges","t":"single","q":"Vrai ou faux : La Kizomba est uniquement une danse solo.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Danse de couple","e":"La Kizomba est principalement une danse sociale de couple."},{"i":"q339","p":"sensation","m":"Douceur","t":"single","q":"Vrai ou faux : La douceur peut demander beaucoup de contrôle.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Douceur","e":"La douceur n’est pas une faiblesse : c’est une énergie maîtrisée."},{"i":"q340","p":"sensation","m":"Tarraxinha","t":"single","q":"Vrai ou faux : La Tarraxinha met souvent l’accent sur les micro-mouvements.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Tarraxinha","e":"Les isolations et micro-mouvements sont importants dans cet univers."},{"i":"q341","p":"sensation","m":"Contrôle","t":"single","q":"Vrai ou faux : L’intensité signifie forcément forcer son partenaire.","o":["Vrai","Faux","Toujours vrai","Réponse sans importance"],"c":[1],"k":"Intensité maîtrisée","e":"L’intensité doit rester contrôlée et respectueuse."},{"i":"q342","p":"culture","m":"Racines","t":"single","q":"Vrai ou faux : Le Semba est une racine importante pour comprendre la Kizomba.","o":["Faux","Ça dépend toujours du hasard","Vrai","Impossible à dire dans l’app"],"c":[2],"k":"Semba","e":"Le Semba donne une base culturelle et corporelle essentielle."},{"i":"q343","p":"culture","m":"Nuances","t":"single","q":"Vrai ou faux : Dire que la Kizomba vient uniquement du Zouk est trop simplifié.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Nuance culturelle","e":"Il faut aussi parler de l’Angola, du Semba et des évolutions locales."},{"i":"q344","p":"culture","m":"Musique vs danse","t":"single","q":"Vrai ou faux : Une musique et une danse ont toujours exactement la même histoire.","o":["Faux","Vrai","Toujours vrai","Réponse sans importance"],"c":[0],"k":"Musique vs danse","e":"Elles sont liées, mais peuvent avoir des histoires différentes."},{"i":"q345","p":"dj","m":"Warm-up","t":"single","q":"Vrai ou faux : Un warm-up sert à installer progressivement l’ambiance.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Warm-up","e":"Il prépare la piste sans brûler l’énergie trop tôt."},{"i":"q346","p":"dj","m":"Lecture de piste","t":"single","q":"Vrai ou faux : Un DJ doit ignorer l’énergie de la salle.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Lecture de piste","e":"Un DJ doit lire la salle pour adapter son set."},{"i":"q347","p":"dj","m":"Énergie","t":"single","q":"Vrai ou faux : Un bon set peut alterner douceur, énergie et respiration.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Set équilibré","e":"La variété garde les danseurs connectés."},{"i":"q348","p":"expert","m":"Urban Kiz","t":"single","q":"Vrai ou faux : Urban Kiz = juste Kizomba moderne est une formulation trop simplifiée.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Nuance Urban Kiz","e":"L’Urban Kiz a ses codes, influences et débats propres."},{"i":"q349","p":"expert","m":"Technique","t":"single","q":"Vrai ou faux : Le Tetris Style est une image pédagogique de précision et de cadre.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Tetris Style","e":"C’est une manière de parler de guidage structuré."},{"i":"q350","p":"expert","m":"Débats","t":"single","q":"Vrai ou faux : Une app culturelle doit toujours parler en vérités fermées.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Formulation prudente","e":"Il faut garder des nuances quand l’histoire est discutée."},{"i":"q351","p":"mindset","m":"Respect","t":"single","q":"Vrai ou faux : La proximité donne tous les droits.","o":["Vrai","Toujours vrai","Réponse sans importance","Faux"],"c":[3],"k":"Respect","e":"La proximité rend le respect encore plus important."},{"i":"q352","p":"mindset","m":"Humilité","t":"single","q":"Vrai ou faux : Un bon danseur reste capable d’apprendre.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Humilité","e":"La progression durable demande humilité et écoute."},{"i":"q353","p":"mindset","m":"Transmission","t":"single","q":"Vrai ou faux : Transmettre, c’est seulement montrer des figures.","o":["Vrai","Faux","Toujours vrai","Réponse sans importance"],"c":[1],"k":"Transmission","e":"Transmettre demande aussi culture, pédagogie et responsabilité."},{"i":"q354","p":"evokeez","m":"LCM","t":"single","q":"Vrai ou faux : LCM peut être compris comme Musicalité, Créativité, Légèreté et Mindset.","o":["Faux","Ça dépend toujours du hasard","Vrai","Impossible à dire dans l’app"],"c":[2],"k":"LCM","e":"Ces piliers structurent une progression consciente."},{"i":"q355","p":"evokeez","m":"Pédagogie","t":"single","q":"Vrai ou faux : La musicalité doit attendre le niveau expert pour être travaillée.","o":["Vrai","Toujours vrai","Réponse sans importance","Faux"],"c":[3],"k":"Musicalité dès le début","e":"La musicalité peut être travaillée dès les premières étapes."},{"i":"q356","p":"pionniers","m":"Musique","t":"single","q":"Vrai ou faux : Eduardo Paím est souvent cité comme une figure majeure de la Kizomba musicale.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Eduardo Paím","e":"Il est souvent présenté comme un pionnier musical important."},{"i":"q357","p":"pionniers","m":"France","t":"single","q":"Vrai ou faux : Laurent Yìshù est associé à la musicalité et à l’expression.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Laurent Yìshù","e":"Son approche met fortement l’accent sur la musicalité."},{"i":"q358","p":"pionniers","m":"DJs","t":"single","q":"Vrai ou faux : Le DJ ne sert qu’à mettre du volume.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Rôle du DJ","e":"Le DJ construit une énergie et une histoire musicale."},{"i":"q359","p":"galactic","m":"Culture","t":"single","q":"Vrai ou faux : Les cartes culturelles rendent le quiz plus éducatif.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Carte culturelle","e":"Elles donnent une mini-leçon après une bonne réponse."},{"i":"q360","p":"galactic","m":"Rétention","t":"single","q":"Vrai ou faux : Avoir plus de 300 questions peut aider à éviter la lassitude.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"300+ questions","e":"Une grande banque rend les parties moins répétitives."}];
+
+const LEVELS = [
+  {name:"Rookie",         min:0,   emoji:"🌱"},
+  {name:"Danseur",        min:120, emoji:"🕺"},
+  {name:"Groove OG",      min:260, emoji:"🔥"},
+  {name:"Galactic",       min:450, emoji:"🚀"},
+  {name:"Master Galactic",min:800, emoji:"🦁"}
+];
+
+const PACKS = [
+  {id:"decouverte",title:"Découverte",emoji:"🌙",lvl:"Facile",unlock:0,  size:8, desc:"Bases, styles et premiers repères."},
+  {id:"sensation", title:"Sensation", emoji:"✨",lvl:"Moyen", unlock:120,size:8, desc:"Douceur, flow, Tarraxinha, Tarraxo, contrôle."},
+  {id:"culture",   title:"Culture",   emoji:"🌍",lvl:"Moyen", unlock:160,size:8, desc:"Racines afro-lusophones, artistes, influences."},
+  {id:"dj",        title:"DJ Kizomba",emoji:"🎧",lvl:"Moyen", unlock:220,size:8, desc:"Lecture de piste, warm-up, transitions, énergie."},
+  {id:"expert",    title:"Expert",    emoji:"⚡",lvl:"Difficile",unlock:260,size:8,desc:"Urban Kiz, Ghetto Zouk, nuances et débats."},
+  {id:"mindset",   title:"Mindset",   emoji:"🧭",lvl:"Moyen", unlock:320,size:8, desc:"Respect, consentement, humilité, transmission."},
+  {id:"evokeez",   title:"Evokeez",   emoji:"💫",lvl:"Difficile",unlock:380,size:8,desc:"Musicalité, créativité, légèreté, pédagogie."},
+  {id:"pionniers", title:"Pionniers", emoji:"👑",lvl:"Difficile",unlock:450,size:8,desc:"Figures, DJs et récits de scène — avec nuance."},
+  {id:"galactic",  title:"Galactic",  emoji:"🚀",lvl:"Ultime", unlock:600,size:8, desc:"Le dernier palier. Nuance obligatoire."}
+];
+
+const K = {xp:"kizombaUrban_xp_v3", cards:"kizombaUrban_cards_v3", seen:"kizombaUrban_seen_v3", daily:"kizombaUrban_daily_v3"};
+
+/* ---------- stockage protégé (correctif 3) ------------------------------- */
+function read(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(raw === null || raw === "") return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed === null || parsed === undefined ? fallback : parsed;
+  }catch(e){ return fallback; }
+}
+function write(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); return true; }
+  catch(e){ toast("Progression non enregistrée : stockage indisponible."); return false; }
+}
+
+let S = {
+  page:"home",
+  xp: Number(read(K.xp,0)) || 0,
+  cards: Array.isArray(read(K.cards,[])) ? read(K.cards,[]) : [],
+  seen: Array.isArray(read(K.seen,[])) ? read(K.seen,[]) : [],
+  pack:null, queue:[], idx:0, picked:[], done:false, ok:false,
+  score:0, gained:0, fresh:[], log:[], sound:false
+};
+
+/* ---------- utilitaires -------------------------------------------------- */
+function shuffle(list){                       // Fisher-Yates
+  const out = list.slice();
+  for(let i = out.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+function levelOf(xp){ return LEVELS.slice().reverse().find(l => xp >= l.min) || LEVELS[0]; }
+function nextLevelOf(xp){ return LEVELS.find(l => l.min > xp) || null; }
+function esc(str){ return String(str).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function packOf(id){ return PACKS.find(p => p.id === id); }
+function poolOf(id){ return QUESTIONS.filter(q => q.p === id); }
+function masteryOf(id){
+  const pool = poolOf(id);
+  if(!pool.length) return 0;
+  return Math.round(100 * pool.filter(q => S.seen.includes(q.i)).length / pool.length);
+}
+
+/* CORRECTIF 1 — les options sont réellement remélangées à chaque partie.
+   L'ancienne version figeait la position de la bonne réponse via l'ID.      */
+function dealQuestion(q){
+  const pairs = q.o.map((text, i) => ({text, right: q.c.includes(i)}));
+  const mixed = shuffle(pairs);
+  return {
+    ...q,
+    o: mixed.map(p => p.text),
+    c: mixed.map((p, i) => p.right ? i : -1).filter(i => i >= 0)
+  };
+}
+
+/* CORRECTIF 5 — XP non farmable : plein tarif la première fois seulement.   */
+function xpFor(q, right){
+  if(!right) return 0;
+  if(S.seen.includes(q.i)) return 2;
+  return q.t === "multi" ? 16 : (q.p === "galactic" || q.p === "pionniers" ? 18 : 10);
+}
+
+let toastTimer;
+function toast(msg){
+  document.querySelectorAll(".toast").forEach(n => n.remove());
+  const el = document.createElement("div");
+  el.className = "toast"; el.setAttribute("role","status"); el.textContent = msg;
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.remove(), 3200);
+}
+
+/* ---------- son (correctif 6) -------------------------------------------- */
+const amb = document.getElementById("amb");
+document.getElementById("sndBtn").addEventListener("click", function(){
+  if(S.sound){ amb.pause(); S.sound = false; this.setAttribute("aria-pressed","false"); return; }
+  amb.volume = 0.22;
+  const p = amb.play();
+  if(p && p.catch){
+    p.then(() => { S.sound = true; this.setAttribute("aria-pressed","true"); })
+     .catch(() => toast("Ambiance indisponible. Ajoute kizomba-loop.mp3 à la racine du site."));
+  }
+});
+
+/* ---------- navigation --------------------------------------------------- */
+function go(page){
+  S.page = page;
+  document.querySelectorAll("#nav button").forEach(b => {
+    if(b.dataset.go === page) b.setAttribute("aria-current","page");
+    else b.removeAttribute("aria-current");
+  });
+  render();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+document.getElementById("nav").addEventListener("click", e => {
+  const b = e.target.closest("button[data-go]");
+  if(b) go(b.dataset.go);
+});
+
+/* ---------- démarrage d'une session -------------------------------------- */
+function startPack(id){
+  const pack = packOf(id);
+  if(!pack) return;
+  if(S.xp < pack.unlock){
+    toast("Pack verrouillé. Encore " + (pack.unlock - S.xp) + " XP.");
+    return go("packs");
+  }
+  const pool = poolOf(id);
+  if(!pool.length) return toast("Ce pack arrive bientôt.");
+
+  /* CORRECTIF 4 — on ne demande jamais plus de questions qu'il n'en existe.
+     On sert d'abord celles jamais vues, pour que rejouer ait un intérêt.    */
+  const unseen = shuffle(pool.filter(q => !S.seen.includes(q.i)));
+  const rest   = shuffle(pool.filter(q =>  S.seen.includes(q.i)));
+  const size   = Math.min(pack.size, pool.length);
+
+  S.pack = pack;
+  S.queue = unseen.concat(rest).slice(0, size).map(dealQuestion);
+  S.idx = 0; S.picked = []; S.done = false; S.ok = false;
+  S.score = 0; S.gained = 0; S.fresh = []; S.log = [];
+  go("quiz");
+}
+
+function startDaily(){
+  /* 5 questions, tirées de façon stable pour la journée en cours. */
+  const day = new Date().toISOString().slice(0,10);
+  let seed = 0; for(const ch of day) seed = (seed * 31 + ch.charCodeAt(0)) % 100000;
+  const sorted = QUESTIONS.slice().sort((a,b) => a.i.localeCompare(b.i));
+  const picked = [];
+  for(let n = 0; n < 5; n++){
+    seed = (seed * 1103515245 + 12345) % 2147483647;
+    const q = sorted[Math.abs(seed) % sorted.length];
+    if(!picked.some(x => x.i === q.i)) picked.push(q); else n--;
+  }
+  S.pack = {id:"daily", title:"Quiz du jour", emoji:"☀️", size:5};
+  S.queue = picked.map(dealQuestion);
+  S.idx = 0; S.picked = []; S.done = false; S.ok = false;
+  S.score = 0; S.gained = 0; S.fresh = []; S.log = [];
+  go("quiz");
+}
+
+/* ---------- réponses ------------------------------------------------------ */
+function pick(i){
+  if(S.done) return;
+  const q = S.queue[S.idx];
+  if(q.t === "multi"){
+    S.picked = S.picked.includes(i) ? S.picked.filter(x => x !== i) : S.picked.concat(i);
+  }else{
+    S.picked = [i];
+  }
+  render();
+}
+
+function validate(){
+  if(S.done) return;
+  if(!S.picked.length) return toast("Choisis au moins une réponse.");
+  const q = S.queue[S.idx];
+  const right = S.picked.length === q.c.length && S.picked.slice().sort().every((v,k) => v === q.c.slice().sort()[k]);
+
+  const gain = xpFor(q, right);
+  S.done = true; S.ok = right; S.gained += gain;
+  if(right) S.score++;
+
+  if(gain){ S.xp += gain; write(K.xp, S.xp); }
+
+  if(right && !S.seen.includes(q.i)){
+    S.seen.push(q.i); write(K.seen, S.seen);
+    if(q.k && !S.cards.some(c => c.title === q.k)){
+      const card = {title:q.k, from:S.pack.title, emoji:S.pack.emoji, text:q.e};
+      S.cards.push(card); write(K.cards, S.cards);
+      S.fresh.push(card);
+    }
+  }
+
+  S.log.push({q:q.q, right, mine:S.picked.map(i => q.o[i]), good:q.c.map(i => q.o[i]), why:q.e});
+  render();
+}
+
+function next(){
+  if(S.idx >= S.queue.length - 1) return go("results");
+  S.idx++; S.picked = []; S.done = false; S.ok = false;
+  render();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+function resetAll(){
+  if(!confirm("Remettre les XP et les cartes à zéro ?")) return;
+  try{ [K.xp,K.cards,K.seen].forEach(k => localStorage.removeItem(k)); }catch(e){}
+  S.xp = 0; S.cards = []; S.seen = [];
+  toast("Progression remise à zéro.");
+  go("home");
+}
+
+/* ---------- écrans -------------------------------------------------------- */
+function viewHome(){
+  const lv = levelOf(S.xp), nx = nextLevelOf(S.xp);
+  const pct = nx ? Math.min(100, Math.round(100 * (S.xp - lv.min) / (nx.min - lv.min))) : 100;
+  const open = PACKS.filter(p => S.xp >= p.unlock).length;
+  return `
+  <section class="hero">
+    <h1><em>Quiz</em>Kizomba<br>Urban</h1>
+    <p>La culture, les racines et les évolutions. Sans trancher les débats à la place de personne.</p>
+    <div class="tempo">
+      <span class="tempo-lbl">85 BPM</span>
+      <span class="tempo-track"></span>
+      <span class="tempo-lbl">1·2·3·4</span>
+    </div>
+    <button class="btn gold" data-act="daily">☀️ Quiz du jour — 5 questions</button>
+    <div class="btn-row"><button class="btn ghost" data-act="packs">Choisir un pack</button></div>
+  </section>
+
+  <div class="panel">
+    <div class="level-row">
+      <div class="level-badge">${lv.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div class="level-name">${lv.name}</div>
+        <div class="level-next">${nx ? `encore <b class="num">${nx.min - S.xp}</b> XP avant ${nx.name}` : "palier maximum atteint"}</div>
+      </div>
+    </div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><b>${S.seen.length}</b><span>Maîtrisées</span></div>
+    <div class="stat"><b>${S.cards.length}</b><span>Cartes</span></div>
+    <div class="stat"><b>${open}/${PACKS.length}</b><span>Packs</span></div>
+  </div>
+  <p class="sig">by KizFlow Studio</p>`;
+}
+
+function viewPacks(){
+  return `<p class="eyebrow">Neuf parcours</p><h2 style="margin-bottom:14px">Choisis ton terrain</h2>` +
+  PACKS.map(p => {
+    const locked = S.xp < p.unlock;
+    const m = masteryOf(p.id);
+    const pool = poolOf(p.id).length;
+    return `<button class="pack ${locked?"locked":""} ${m===100?"done":""}" data-pack="${p.id}" ${locked?'aria-disabled="true"':""}>
+      <span class="emo">${p.emoji}</span>
+      <span class="ttl"><h3>${p.title}</h3><span class="lvl">${p.lvl}</span></span>
+      <p>${p.desc}</p>
+      <span class="meta">
+        ${locked ? `🔒 ${p.unlock} XP requis` : `${Math.min(p.size,pool)} questions · ${pool} au total`}
+        ${!locked ? `<span class="mastery">${m===100?"★ Maîtrisé":m+" %"}</span>` : ""}
+      </span>
+    </button>`;
+  }).join("");
+}
+
+function viewQuiz(){
+  const q = S.queue[S.idx];
+  if(!q){ return `<div class="empty"><span>◇</span>Session vide. Reviens aux packs.</div>`; }
+  const beats = S.queue.map((_,i) => `<b class="${i < S.idx ? "past" : i === S.idx ? "now" : ""}"></b>`).join("");
+  return `
+  <div class="count">${beats}</div>
+  <div class="count-lbl"><span>${S.pack.emoji} ${S.pack.title}</span><span>${S.idx+1} / ${S.queue.length}</span></div>
+
+  <span class="q-mod">${esc(q.m)}</span>
+  <div class="q-text">${esc(q.q)}</div>
+  ${q.t === "multi" ? `<div class="q-hint">◆ Plusieurs bonnes réponses</div>` : ""}
+
+  ${q.o.map((text,i) => {
+    let cls = "";
+    if(S.done){
+      if(q.c.includes(i)) cls = "right";
+      else if(S.picked.includes(i)) cls = "wrong";
+    }else if(S.picked.includes(i)) cls = "sel";
+    return `<button class="opt ${cls}" data-opt="${i}" ${S.done?"disabled":""}>
+      <span class="tick">${S.done ? (q.c.includes(i) ? "✓" : (S.picked.includes(i) ? "✕" : "")) : "✓"}</span>
+      <span>${esc(text)}</span>
+    </button>`;
+  }).join("")}
+
+  ${S.done ? `<div class="explain ${S.ok?"":"ko"}">
+      <b>${S.ok ? "Bien vu" : "Pas tout à fait"}</b>${esc(q.e)}
+    </div>` : ""}
+
+  ${S.done
+    ? `<button class="btn" data-act="next">${S.idx >= S.queue.length-1 ? "Voir le résultat" : "Question suivante"} →</button>`
+    : `<button class="btn" data-act="validate" ${S.picked.length?"":"disabled"}>Valider</button>`}
+  <div class="btn-row"><button class="btn ghost" data-act="packs">Quitter</button></div>`;
+}
+
+function viewResults(){
+  const pct = Math.round(100 * S.score / Math.max(1,S.queue.length));
+  return `
+  <p class="eyebrow">${S.pack.emoji} ${S.pack.title}</p>
+  <div class="score-ring" style="--pct:${pct}%"><div><b>${S.score}<span style="font-size:17px;color:var(--muted)">/${S.queue.length}</span></b><span>Score</span></div></div>
+
+  <div class="stat-row">
+    <div class="stat"><b>+${S.gained}</b><span>XP gagnés</span></div>
+    <div class="stat"><b>${S.fresh.length}</b><span>Cartes</span></div>
+    <div class="stat"><b>${pct}%</b><span>Réussite</span></div>
+  </div>
+
+  ${S.fresh.length ? `<div class="panel">
+    <p class="eyebrow" style="margin-bottom:10px">Nouvelles cartes</p>
+    <div class="cards-grid">${S.fresh.map(c => ccard(c)).join("")}</div>
+  </div>` : ""}
+
+  <div class="panel">
+    <p class="eyebrow" style="margin-bottom:4px">Ce que tu retiens</p>
+    ${S.log.map(l => `<div class="recap">
+      <span class="dot ${l.right?"ok":"ko"}"></span>
+      <div><div>${esc(l.q)}</div><p>${l.right ? "✓ " + esc(l.good.join(" · ")) : "→ " + esc(l.good.join(" · "))}</p></div>
+    </div>`).join("")}
+  </div>
+
+  <button class="btn" data-act="replay">Rejouer ce pack</button>
+  <div class="btn-row">
+    <button class="btn ghost" data-act="packs">Packs</button>
+    <button class="btn ghost" data-act="cards">Mes cartes</button>
+  </div>`;
+}
+
+function ccard(c){
+  return `<article class="ccard">
+    <div class="emo">${c.emoji||"✦"}</div>
+    <h3>${esc(c.title)}</h3>
+    <p>${esc(String(c.text).slice(0,96))}${String(c.text).length>96?"…":""}</p>
+    <div class="from">${esc(c.from||"Culture")}</div>
+  </article>`;
+}
+
+function viewCards(){
+  if(!S.cards.length){
+    return `<p class="eyebrow">Collection</p><h2 style="margin-bottom:14px">Mes cartes</h2>
+    <div class="empty"><span>✦</span>Aucune carte pour l'instant.<br>Chaque bonne réponse inédite en débloque une.</div>
+    <div class="btn-row"><button class="btn" data-act="packs">Commencer</button></div>`;
+  }
+  return `<p class="eyebrow">${S.cards.length} carte${S.cards.length>1?"s":""} débloquée${S.cards.length>1?"s":""}</p>
+  <h2 style="margin-bottom:14px">Mes cartes</h2>
+  <div class="cards-grid">${S.cards.map(c => ccard(c)).join("")}</div>
+  <div class="btn-row"><button class="btn danger" data-act="reset">Remettre la progression à zéro</button></div>`;
+}
+
+function viewInfos(){
+  return `<p class="eyebrow">La règle de la maison</p>
+  <h2 style="margin-bottom:14px">Culture, pas verdict</h2>
+  <div class="panel">
+    <h3 style="margin-bottom:8px">Ce que cette app fait</h3>
+    <p style="font-size:13.5px">Elle transmet des repères sur la Kizomba, le Semba, l'Urban Kiz, le Tarraxo, la Tarraxinha et le Ghetto Zouk. Elle sépare toujours ce qui relève de la musique de ce qui relève de la danse.</p>
+  </div>
+  <div class="panel">
+    <h3 style="margin-bottom:8px">Ce qu'elle ne fait pas</h3>
+    <p style="font-size:13.5px">Elle ne tranche pas les débats de la scène. Sur les origines de l'Urban Kiz, sur les rôles de chacun, sur la frontière entre Tarraxinha et Tarraxo, elle dit « souvent présenté comme » et laisse la discussion ouverte.</p>
+  </div>
+  <div class="panel">
+    <h3 style="margin-bottom:8px">Une question te semble fausse ?</h3>
+    <p style="font-size:13.5px;margin-bottom:0">Elle l'est peut-être. Les récits de scène se contredisent et cette app n'est pas au-dessus. Écris-nous et on corrige, source à l'appui.</p>
+  </div>
+  <div class="stat-row">
+    <div class="stat"><b>${QUESTIONS.length}</b><span>Questions</span></div>
+    <div class="stat"><b>${PACKS.length}</b><span>Packs</span></div>
+    <div class="stat"><b>${new Set(QUESTIONS.map(q=>q.m)).size}</b><span>Thèmes</span></div>
+  </div>
+  <p class="sig">by KizFlow Studio</p>`;
+}
+
+/* ---------- rendu --------------------------------------------------------- */
+function render(){
+  const lv = levelOf(S.xp);
+  document.getElementById("xpVal").textContent = S.xp;
+  document.getElementById("lvlEmo").textContent = lv.emoji;
+  const view = document.getElementById("view");
+  view.innerHTML =
+    S.page === "home"    ? viewHome()    :
+    S.page === "packs"   ? viewPacks()   :
+    S.page === "quiz"    ? viewQuiz()    :
+    S.page === "results" ? viewResults() :
+    S.page === "cards"   ? viewCards()   : viewInfos();
+}
+
+document.getElementById("view").addEventListener("click", e => {
+  const opt = e.target.closest("[data-opt]");
+  if(opt) return pick(Number(opt.dataset.opt));
+  const pk = e.target.closest("[data-pack]");
+  if(pk) return startPack(pk.dataset.pack);
+  const act = e.target.closest("[data-act]");
+  if(!act) return;
+  const a = act.dataset.act;
+  if(a === "daily")    return startDaily();
+  if(a === "packs")    return go("packs");
+  if(a === "cards")    return go("cards");
+  if(a === "validate") return validate();
+  if(a === "next")     return next();
+  if(a === "reset")    return resetAll();
+  if(a === "replay")   return S.pack.id === "daily" ? startDaily() : startPack(S.pack.id);
+});
+
+go("home");
+</script>
+</body>
+</html>
