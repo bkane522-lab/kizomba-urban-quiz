@@ -100,6 +100,18 @@ body[data-page="quiz"]::after{opacity:1}
   background:rgba(232,184,75,.10);border:1px solid rgba(232,184,75,.28);
   font-family:var(--mono);font-size:11.5px;color:var(--gold);white-space:nowrap;
 }
+.lang{display:flex;gap:2px;padding:2px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.lang button{
+  padding:5px 9px;border-radius:999px;font-family:var(--mono);font-size:10px;
+  letter-spacing:.06em;color:var(--muted);line-height:1;
+}
+.lang button[aria-pressed="true"]{background:rgba(123,47,247,.30);color:var(--paper)}
+.nav button em{font-style:normal}
+.q-note{
+  display:inline-block;font-size:10px;letter-spacing:.08em;color:var(--muted);
+  border:1px dashed var(--line);border-radius:999px;padding:4px 10px;margin-bottom:12px;
+}
 .snd{
   width:36px;height:36px;flex:0 0 36px;border-radius:50%;
   border:1px solid var(--line);background:rgba(255,255,255,.03);
@@ -413,16 +425,20 @@ p{margin:0 0 12px;color:var(--muted)}
     <span>Quiz</span>
   </div>
   <div class="xp-chip"><span id="lvlEmo">🌱</span><span class="num" id="xpVal">0</span> XP</div>
+  <div class="lang" id="langBtn">
+    <button data-lang="fr" aria-pressed="true">FR</button>
+    <button data-lang="en" aria-pressed="false">EN</button>
+  </div>
   <button class="snd" id="sndBtn" aria-pressed="false" aria-label="Activer le son d'ambiance">♪</button>
 </header>
 
 <main class="shell" id="view"></main>
 
 <nav class="nav" id="nav">
-  <button data-go="home"><i>◆</i>Accueil</button>
-  <button data-go="packs"><i>▤</i>Packs</button>
-  <button data-go="cards"><i>✦</i>Cartes</button>
-  <button data-go="infos"><i>≡</i>Culture</button>
+  <button data-go="home"><i>◆</i><em>Accueil</em></button>
+  <button data-go="packs"><i>▤</i><em>Packs</em></button>
+  <button data-go="cards"><i>✦</i><em>Cartes</em></button>
+  <button data-go="infos"><i>≡</i><em>Culture</em></button>
 </nav>
 
 <audio id="amb" src="kizomba-loop.mp3" loop preload="none"></audio>
@@ -438,31 +454,131 @@ p{margin:0 0 12px;color:var(--muted)}
 
 const QUESTIONS = [{"i":"q274","p":"decouverte","m":"Bases","t":"multi","q":"Quels éléments sont importants dans la Kizomba ?","o":["Sauts acrobatiques obligatoires","Connexion","Musicalité","Transfert de poids"],"c":[1,2,3],"k":"Bases Kizomba","e":"La Kizomba demande connexion, musicalité et gestion du poids."},{"i":"q275","p":"decouverte","m":"Styles","t":"multi","q":"Quels mots peuvent être liés au Semba ?","o":["Fête","Énergie","Silence total","Angola"],"c":[0,1,3],"k":"Semba vivant","e":"Le Semba est festif, expressif et lié à l’Angola."},{"i":"q276","p":"decouverte","m":"Styles","t":"multi","q":"Quels styles ou univers apparaissent souvent dans une soirée Kizomba moderne ?","o":["Kizomba","Semba","Urban Kiz","Ghetto Zouk"],"c":[0,1,2,3],"k":"Soirée moderne","e":"Une soirée moderne peut mélanger plusieurs univers selon le public."},{"i":"q277","p":"decouverte","m":"Premiers pièges","t":"multi","q":"Quels éléments sont plutôt des musiques ou univers musicaux ?","o":["Ghetto Zouk","Guidage","Cabo Love","Pop Palop"],"c":[0,2,3],"k":"Univers musicaux","e":"Ghetto Zouk, Cabo Love et Pop Palop sont des univers musicaux."},{"i":"q278","p":"sensation","m":"Douceur","t":"multi","q":"Quels éléments sont importants dans la douceur ?","o":["Brutalité","Écoute","Contrôle","Respect du partenaire"],"c":[1,2,3],"k":"Douceur avancée","e":"La douceur demande présence, contrôle et respect."},{"i":"q279","p":"sensation","m":"Tarraxinha","t":"multi","q":"Quels éléments sont liés à la Tarraxinha ?","o":["Micro-mouvements","Isolations","Course rapide","Bassin"],"c":[0,1,3],"k":"Tarraxinha technique","e":"La Tarraxinha se concentre souvent sur les isolations et les micro-mouvements."},{"i":"q280","p":"sensation","m":"Flow","t":"multi","q":"Le flow peut naître de…","o":["La musique","Le ressenti","La dynamique","L’absence d’écoute"],"c":[0,1,2],"k":"Flow","e":"Le flow relie musique, corps, ressenti et intention."},{"i":"q281","p":"sensation","m":"Tarraxo","t":"multi","q":"Quels mots peuvent correspondre au Tarraxo ?","o":["Basses profondes","Silence total","Intensité","Contrôle"],"c":[0,2,3],"k":"Tarraxo","e":"Le Tarraxo est souvent lié à des sons lourds et à une énergie contrôlée."},{"i":"q282","p":"sensation","m":"Contrôle","t":"multi","q":"Quels éléments aident à danser sans brutalité ?","o":["Force imposée","Contrôle","Respiration","Écoute"],"c":[1,2,3],"k":"Danser propre","e":"Une danse propre demande écoute, respiration et contrôle."},{"i":"q283","p":"culture","m":"Racines","t":"multi","q":"Quels univers ont nourri les musiques liées à la Kizomba ?","o":["Semba","Zouk","Silence total","Cabo Love"],"c":[0,1,3],"k":"Racines musicales","e":"La Kizomba et ses voisins sont nourris par plusieurs influences afro-lusophones et afro-caribéennes."},{"i":"q284","p":"culture","m":"Artistes","t":"multi","q":"Quels artistes sont liés aux univers Kizomba / Ghetto Zouk / Pop Palop ?","o":["Nelson Freitas","Anselmo Ralph","C4 Pedro","Beethoven uniquement"],"c":[0,1,2],"k":"Artistes afro-lusophones","e":"Ces artistes font partie des noms importants dans ces univers musicaux."},{"i":"q285","p":"culture","m":"PALOP","t":"multi","q":"Quels mots sont liés à la culture afro-lusophone ?","o":["Angola","Antarctique","Cap-Vert","Portugal"],"c":[0,2,3],"k":"Afro-lusophone","e":"L’univers afro-lusophone relie notamment Angola, Cap-Vert, Portugal et diasporas."},{"i":"q286","p":"culture","m":"Nuances","t":"multi","q":"Quelles formulations sont bonnes pour éviter les polémiques ?","o":["La seule vérité est","Souvent présenté comme","Selon certaines écoles","Dans certaines scènes"],"c":[1,2,3],"k":"Nuance éditoriale","e":"Certains sujets sont débattus : il faut transmettre avec nuance."},{"i":"q287","p":"dj","m":"Lecture de piste","t":"multi","q":"Quels éléments un DJ doit observer sur la piste ?","o":["L’énergie","La fatigue","La couleur des chaussures uniquement","Le niveau des danseurs"],"c":[0,1,3],"k":"Lecture de piste","e":"Un DJ adapte son set à l’ambiance réelle de la salle."},{"i":"q288","p":"dj","m":"Énergie","t":"multi","q":"Le DJ doit adapter son set selon…","o":["Le public","L’énergie","Le moment de la soirée","Rien du tout"],"c":[0,1,2],"k":"Adaptation DJ","e":"Un DJ attentif adapte son choix musical au contexte réel."},{"i":"q289","p":"dj","m":"Styles","t":"multi","q":"Quels styles peuvent aider à faire respirer une soirée ?","o":["Semba","Tarraxo intense non-stop","Kizomba douce","Ghetto Zouk bien placé"],"c":[0,2,3],"k":"Respiration de soirée","e":"Une soirée équilibrée alterne douceur, énergie et respiration."},{"i":"q290","p":"dj","m":"Transitions","t":"multi","q":"Une bonne transition doit être…","o":["Complètement hasardeuse","Cohérente","Fluide","Adaptée à l’énergie"],"c":[1,2,3],"k":"Transition DJ","e":"La transition garde les danseurs dans le voyage."},{"i":"q291","p":"expert","m":"Urban Kiz","t":"multi","q":"Quels éléments peuvent influencer l’Urban Kiz ?","o":["Kizomba","Ghetto Zouk","R&B / Hip-Hop","Musiques électroniques"],"c":[0,1,2,3],"k":"Influences Urban Kiz","e":"L’Urban Kiz est un style moderne nourri par plusieurs influences."},{"i":"q292","p":"expert","m":"Technique","t":"multi","q":"Quels éléments sont liés au Tetris Style comme approche pédagogique ?","o":["Cadre","Guidage précis","Transferts de poids","Flou permanent"],"c":[0,1,2],"k":"Tetris Style","e":"Le Tetris Style est un style à part entière, annoncé en 2025 par Val'R & Sarah : cadre, guidage précis, placements qui s'emboîtent. Ce n'est pas qu'une image pédagogique.","s":"The Kiz Lab · programmes de stages"},{"i":"q293","p":"expert","m":"Nuances","t":"multi","q":"Quels éléments rendent une question plus Expert ?","o":["Nuance culturelle","Réponse évidente sans réflexion","Comparaison entre styles","Piège musique vs danse"],"c":[0,2,3],"k":"Niveau Expert","e":"Une question Expert oblige à comprendre, pas seulement mémoriser."},{"i":"q294","p":"expert","m":"Débats","t":"multi","q":"Quels sujets doivent être présentés avec prudence ?","o":["La nécessité du respect","Origines exactes","Créateur unique","Différences Urban Kiz/Kizomba"],"c":[1,2,3],"k":"Prudence Expert","e":"Certains sujets varient selon les scènes, les sources et les témoignages."},{"i":"q295","p":"mindset","m":"Respect","t":"multi","q":"Quels comportements montrent un bon mindset ?","o":["Écouter son partenaire","Respecter les limites","Se moquer des débutants","Rester humble"],"c":[0,1,3],"k":"Mindset danseur","e":"Le niveau technique ne vaut rien sans respect et humilité."},{"i":"q296","p":"mindset","m":"Musicalité","t":"multi","q":"Danser la musique signifie écouter…","o":["Les silences","Les voix","Les basses","Les émotions"],"c":[0,1,2,3],"k":"Musicalité incarnée","e":"La musicalité donne du sens au mouvement."},{"i":"q297","p":"mindset","m":"Transmission","t":"multi","q":"Quels éléments appartiennent à une bonne transmission ?","o":["Méthode","Mépris","Culture","Responsabilité"],"c":[0,2,3],"k":"Transmission complète","e":"Transmettre, c’est donner du contenu, une méthode et une conscience."},{"i":"q298","p":"mindset","m":"Respect","t":"multi","q":"La proximité demande surtout…","o":["Obligation","Respect","Écoute","Consentement"],"c":[1,2,3],"k":"Proximité respectueuse","e":"Plus une danse est proche, plus le respect doit être clair."},{"i":"q299","p":"evokeez","m":"LCM","t":"multi","q":"Quels piliers peuvent aider un danseur à progresser durablement ?","o":["Musicalité","Créativité","Brutalité","Légèreté"],"c":[0,1,3],"k":"LCM","e":"Musicalité, Créativité et Légèreté peuvent structurer une progression consciente."},{"i":"q300","p":"evokeez","m":"Pédagogie","t":"multi","q":"Former des professeurs demande surtout…","o":["Méthode","Culture","Pédagogie","Mindset"],"c":[0,1,2,3],"k":"Formation professeur","e":"Former un professeur, c’est transmettre une responsabilité, pas seulement des pas."},{"i":"q301","p":"evokeez","m":"LCM","t":"multi","q":"Quels éléments vont avec la légèreté ?","o":["Contrôle","Mouvements brusques","Fluidité","Relâchement"],"c":[0,2,3],"k":"Légèreté","e":"La légèreté demande précision, relâchement et maîtrise."},{"i":"q302","p":"evokeez","m":"Créativité","t":"multi","q":"La créativité fonctionne mieux avec…","o":["Le mépris des fondamentaux","Des bases solides","De l’écoute","Une intention"],"c":[1,2,3],"k":"Créativité consciente","e":"La créativité n’efface pas les bases : elle les transforme."},{"i":"q303","p":"pionniers","m":"France","t":"multi","q":"Quels noms sont souvent cités autour de l’Urban Kiz en France ?","o":["Curtis Seldon","Enah Lebon","Mozart","Moun"],"c":[0,1,3],"k":"Pionniers Urban Kiz","e":"Ces noms reviennent souvent dans l’histoire française de l’Urban Kiz."},{"i":"q304","p":"pionniers","m":"DJs","t":"multi","q":"Quels noms sont liés à la scène DJ Kizomba / Ghetto Zouk ?","o":["DJ Elji","DJ Anaïs","DJ Znobia","DJ Silence total"],"c":[0,1,2],"k":"DJs Kizomba","e":"Ces DJs sont associés à des univers importants de la scène."},{"i":"q305","p":"pionniers","m":"Transmission","t":"multi","q":"Quels profils peuvent être des bâtisseurs de culture ?","o":["Professeurs","DJs","Organisateurs","Élèves passionnés"],"c":[0,1,2,3],"k":"Bâtisseurs","e":"Une culture grandit grâce à toute une chaîne de transmission."},{"i":"q306","p":"galactic","m":"Culture","t":"multi","q":"La philosophie de l’app doit transmettre…","o":["Le mépris des styles","Les racines","Les évolutions","Le respect"],"c":[1,2,3],"k":"Mission Galactic","e":"L’app doit être pédagogique, ouverte et respectueuse."},{"i":"q307","p":"galactic","m":"DJ","t":"multi","q":"Quels éléments peuvent faire une soirée mémorable ?","o":["Bon timing","Transitions cohérentes","Volume fort sans logique","Lecture de piste"],"c":[0,1,3],"k":"Soirée mémorable","e":"Un bon set construit des souvenirs par l’énergie, la sélection et le timing."},{"i":"q308","p":"galactic","m":"Débats","t":"multi","q":"Une bonne app culturelle doit éviter…","o":["Les vérités trop fermées","Le mépris","Les affirmations sans nuance","La pédagogie"],"c":[0,1,2],"k":"Esprit critique","e":"La culture demande nuance, précision et respect."},{"i":"q309","p":"galactic","m":"Scénarios","t":"multi","q":"Quels éléments aident à garder les utilisateurs dans l’app ?","o":["Questions variées","Toutes les réponses en A","Cartes culturelles","Packs verrouillés"],"c":[0,2,3],"k":"Rétention","e":"Une app durable mélange progression, collection et variété."},{"i":"q310","p":"decouverte","m":"Premiers pièges","t":"single","q":"Musique et danse : quelle formulation est la plus juste ?","o":["Ghetto Zouk = figure de bras","Kizomba = danse sans musique","Kizomba = connexion et marche / Ghetto Zouk = musique","Les deux sont toujours exactement la même chose"],"c":[2],"k":"Différence simple","e":"La Kizomba est une danse et une culture, tandis que le Ghetto Zouk est un univers musical."},{"i":"q311","p":"sensation","m":"Tarraxinha","t":"single","q":"Quelle différence est la plus juste ?","o":["Tarraxinha = course rapide","Tarraxo = silence total","Aucune nuance n’existe","Tarraxinha = lenteur et micro-mouvements / Tarraxo = énergie souvent plus moderne et intense"],"c":[3],"k":"Tarraxo vs Tarraxinha","e":"Tarraxinha et Tarraxo n'ont pas la même histoire : la tarraxinha vient d'Angola (Benguela) et d'un kuduro ralenti ; le tarraxo apparaît à Lisbonne au début des années 2010. La distinction technique reste variable selon les scènes.","s":"Wikipédia · Discovering Kizomba"},{"i":"q312","p":"culture","m":"Musique vs danse","t":"single","q":"Quelle phrase est la plus juste ?","o":["La musique et la danse sont liées, mais elles peuvent avoir des histoires différentes","La musique et la danse sont toujours la même chose","La danse n’a jamais de culture","La musique n’influence jamais la danse"],"c":[0],"k":"Musique vs danse","e":"C’est une notion centrale pour comprendre Kizomba, Urban Kiz et Ghetto Zouk."},{"i":"q313","p":"dj","m":"Énergie","t":"single","q":"Quelle séquence est la plus logique pour une soirée équilibrée ?","o":["Tarraxo intense dès la première minute uniquement","Warm-up → connexion → montée d’énergie → respiration → intensité selon la piste","Le même son toute la soirée","Silence puis arrêt de soirée"],"c":[1],"k":"Set équilibré","e":"Une bonne soirée respire, monte et redescend."},{"i":"q314","p":"expert","m":"Urban Kiz","t":"single","q":"Quelle définition est la plus équilibrée ?","o":["Urban Kiz = aucune racine","Urban Kiz = toujours exactement Kizomba traditionnelle","Urban Kiz = style moderne influencé par la Kizomba et les musiques urbaines","Urban Kiz = une figure unique"],"c":[2],"k":"Définition équilibrée","e":"Cette formulation respecte à la fois les racines et les évolutions."},{"i":"q315","p":"mindset","m":"Respect","t":"single","q":"Quelle réaction est la plus juste si le partenaire semble mal à l’aise ?","o":["Forcer plus","Ignorer les signaux","Se moquer","Adapter ou arrêter"],"c":[3],"k":"Écoute corporelle","e":"Le confort du partenaire passe avant la figure."},{"i":"q316","p":"evokeez","m":"LCM","t":"single","q":"Quelle phrase résume le mieux Musicalité, Créativité, Légèreté et Mindset ?","o":["Une progression consciente qui relie écoute, expression et état d’esprit","Une méthode pour forcer plus","Une compétition de vitesse","Une danse sans bases"],"c":[0],"k":"LCM","e":"LCM structure une progression consciente et musicale."},{"i":"q317","p":"pionniers","m":"Transmission","t":"single","q":"Quelle phrase est la plus prudente sur Mestre Petchu ?","o":["Le créateur unique de tout","Une grande figure de transmission des danses angolaises","Un DJ de techno","Un personnage fictif"],"c":[1],"k":"Mestre Petchu","e":"Formulation prudente confirmée : figure majeure de la transmission des danses angolaises, parmi les premiers à les enseigner au Portugal à la fin des années 1990. Prix national angolais de la Culture et des Arts 2024.","s":"Robb Report Africa · Danças do Mundo"},{"i":"q318","p":"galactic","m":"Débats","t":"single","q":"Quelle phrase correspond le mieux à l’esprit de l’app ?","o":["Dire qu’un seul style mérite d’exister","Supprimer les nuances","Transmettre la culture, les racines et les évolutions sans mépriser les styles","Transformer la culture en ego"],"c":[2],"k":"Philosophie Kizomba Urban Quiz","e":"L’app doit être pédagogique, ouverte et respectueuse."},{"i":"q319","p":"decouverte","m":"Connexion","t":"single","q":"Un débutant veut faire beaucoup de figures dès la première danse. Quelle priorité lui rappeler ?","o":["Forcer les passes","Ignorer le rythme","Danser seulement pour se montrer","Écouter la musique et son partenaire"],"c":[3],"k":"Priorité débutant","e":"La connexion et l’écoute construisent une meilleure danse que l’accumulation de figures."},{"i":"q320","p":"decouverte","m":"Styles","t":"single","q":"Une personne confond Ghetto Zouk et danse. Quelle correction est la plus juste ?","o":["Le Ghetto Zouk est principalement un univers musical","C’est une figure de Semba","C’est une danse traditionnelle cubaine","C’est un pas obligatoire"],"c":[0],"k":"Ghetto Zouk","e":"Le Ghetto Zouk est d'abord un genre musical, nommé par des artistes capverdiens aux Pays-Bas à la fin des années 1990. Nuance : une méthode de danse portant ce nom existe aussi.","s":"Discovering Kizomba · Kizomba Prague"},{"i":"q321","p":"sensation","m":"Douceur","t":"single","q":"Un danseur croit que douceur veut dire absence d’énergie. Que répondre ?","o":["Oui, il ne faut plus bouger","La douceur est une énergie maîtrisée","Il faut guider plus fort","La douceur n’a aucun lien avec la danse"],"c":[1],"k":"Douceur consciente","e":"La douceur demande contrôle, écoute et précision."},{"i":"q322","p":"sensation","m":"Tarraxinha","t":"single","q":"Dans une danse très proche, quel élément devient encore plus important ?","o":["L’obligation de suivre","La force","Le respect du confort et des limites","La vitesse"],"c":[2],"k":"Proximité respectueuse","e":"Plus la danse est proche, plus le respect doit être clair."},{"i":"q323","p":"culture","m":"Nuances","t":"single","q":"Une personne dit : “La Kizomba vient uniquement du Zouk.” Quelle réponse est la plus correcte ?","o":["C’est la seule vérité","Le Semba n’existe pas","La culture n’a aucune importance","C’est trop simplifié : il faut aussi parler de l’Angola, du Semba et des évolutions locales"],"c":[3],"k":"Nuance culturelle","e":"Le zouk de Kassav' a bien influencé la musique, mais la kizomba naît de sa rencontre avec le semba dans le Luanda d'après l'indépendance.","s":"Wikipédia · Ambassade d'Angola"},{"i":"q324","p":"culture","m":"Musique vs danse","t":"single","q":"Pourquoi distinguer musique et danse dans l’app ?","o":["Pour éviter de confondre un support musical avec un style dansé","Pour compliquer sans raison","Parce que la danse n’a pas besoin de musique","Parce que tous les styles sont identiques"],"c":[0],"k":"Musique vs danse","e":"Cette distinction rend les questions plus intelligentes."},{"i":"q325","p":"dj","m":"Warm-up","t":"single","q":"Le DJ arrive sur une piste froide. Que doit-il éviter ?","o":["Installer progressivement","Commencer directement par une intensité trop lourde","Observer la salle","Choisir une énergie adaptée"],"c":[1],"k":"Timing DJ","e":"Le warm-up prépare la piste."},{"i":"q326","p":"dj","m":"Lecture de piste","t":"single","q":"La piste fatigue. Quelle décision peut aider ?","o":["Monter encore plus fort sans lire la salle","Ignorer les danseurs","Faire respirer avec une énergie plus joyeuse ou plus douce","Couper toute la musique"],"c":[2],"k":"Respiration DJ","e":"Un DJ doit sentir quand la piste a besoin de respirer."},{"i":"q327","p":"expert","m":"Urban Kiz","t":"single","q":"Pourquoi “Urban Kiz = Kizomba moderne” est trop simplifié ?","o":["Parce que l’Urban Kiz n’a aucune musique","Parce que la Kizomba n’existe pas","Parce qu’il n’y a jamais de nuance","Parce que l’Urban Kiz a ses influences, codes et débats propres"],"c":[3],"k":"Nuance Urban Kiz","e":"La nuance permet de respecter les racines et les évolutions."},{"i":"q328","p":"expert","m":"Technique","t":"single","q":"Un guidage devient flou. Quel élément technique peut aider ?","o":["Clarifier le cadre et le transfert de poids","Tirer plus fort","Accélérer sans écouter","Ignorer le partenaire"],"c":[0],"k":"Guidage précis","e":"Un bon guidage passe par la clarté, pas par la force."},{"i":"q329","p":"mindset","m":"Respect","t":"single","q":"Un partenaire refuse une danse. Quelle réaction est correcte ?","o":["Insister","Respecter le refus simplement","Culpabiliser","Se moquer"],"c":[1],"k":"Consentement","e":"Le droit de refuser fait partie du respect."},{"i":"q330","p":"mindset","m":"Humilité","t":"single","q":"Un danseur avancé se moque des débutants. Quel mindset manque ?","o":["La vitesse","La force","L’humilité","Le bruit"],"c":[2],"k":"Humilité","e":"Le niveau technique ne justifie jamais le mépris."},{"i":"q331","p":"evokeez","m":"Musicalité","t":"single","q":"Un élève connaît des figures mais danse sans écouter. Quel axe travailler ?","o":["Forcer les bras","Ignorer les silences","Faire plus vite","La musicalité"],"c":[3],"k":"Musicalité","e":"La musicalité donne du sens aux figures."},{"i":"q332","p":"evokeez","m":"Légèreté","t":"single","q":"Une danse semble lourde et forcée. Quel pilier peut aider ?","o":["La légèreté","La brutalité","La précipitation","L’ego"],"c":[0],"k":"Légèreté","e":"La légèreté demande contrôle, relâchement et écoute."},{"i":"q333","p":"pionniers","m":"France","t":"single","q":"Une personne découvre l’histoire Urban Kiz en France. Quels noms peuvent apparaître en premier ?","o":["Mozart, Chopin et Bach","Curtis Seldon, Enah Lebon et Moun","Pelé, Maradona et Zidane","Picasso, Van Gogh et Monet"],"c":[1],"k":"Pionniers Urban Kiz","e":"Ces noms sont souvent cités dans l’histoire française de l’Urban Kiz."},{"i":"q334","p":"pionniers","m":"Evokeez","t":"single","q":"Quel duo est associé à l’écosystème Evokeez ?","o":["Laurent Yìshù et Sophie Madison","Curtis Seldon et Cherazad","Val'R et Sarah","Bonga et Paulo Flores"],"c":[0],"k":"Evokeez","e":"Orthographe corrigée : Sophie Madison. Ils animent ensemble les émissions produites par Evokeez Paris.","s":"Evokeez Paris"},{"i":"q335","p":"galactic","m":"Rétention","t":"single","q":"Pourquoi ajouter beaucoup de questions dans l’app ?","o":["Pour rendre toutes les réponses faciles","Pour cacher le contenu","Pour supprimer les packs","Pour éviter que les utilisateurs se lassent trop vite"],"c":[3],"k":"Rétention","e":"Une grande banque de questions rend les sessions plus variées."},{"i":"q336","p":"galactic","m":"Scénarios","t":"single","q":"Que doit faire une bonne question Expert ?","o":["Faire réfléchir avec nuance","Donner toujours la réponse A","Être évidente","Supprimer l’explication"],"c":[0],"k":"Question Expert","e":"Les niveaux élevés doivent devenir plus coriaces mais rester justes."},{"i":"q338","p":"decouverte","m":"Premiers pièges","t":"single","q":"Vrai ou faux : La Kizomba est uniquement une danse solo.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Danse de couple","e":"La Kizomba est principalement une danse sociale de couple."},{"i":"q339","p":"sensation","m":"Douceur","t":"single","q":"Vrai ou faux : La douceur peut demander beaucoup de contrôle.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Douceur","e":"La douceur n’est pas une faiblesse : c’est une énergie maîtrisée."},{"i":"q340","p":"sensation","m":"Tarraxinha","t":"single","q":"Vrai ou faux : La Tarraxinha met souvent l’accent sur les micro-mouvements.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Tarraxinha","e":"Les isolations et micro-mouvements sont importants dans cet univers."},{"i":"q341","p":"sensation","m":"Contrôle","t":"single","q":"Vrai ou faux : L’intensité signifie forcément forcer son partenaire.","o":["Vrai","Faux","Toujours vrai","Réponse sans importance"],"c":[1],"k":"Intensité maîtrisée","e":"L’intensité doit rester contrôlée et respectueuse."},{"i":"q342","p":"culture","m":"Racines","t":"single","q":"Vrai ou faux : Le Semba est une racine importante pour comprendre la Kizomba.","o":["Faux","Ça dépend toujours du hasard","Vrai","Impossible à dire dans l’app"],"c":[2],"k":"Semba","e":"Le Semba donne une base culturelle et corporelle essentielle."},{"i":"q344","p":"culture","m":"Musique vs danse","t":"single","q":"Vrai ou faux : Une musique et une danse ont toujours exactement la même histoire.","o":["Faux","Vrai","Toujours vrai","Réponse sans importance"],"c":[0],"k":"Musique vs danse","e":"Elles sont liées, mais peuvent avoir des histoires différentes."},{"i":"q345","p":"dj","m":"Warm-up","t":"single","q":"Vrai ou faux : Un warm-up sert à installer progressivement l’ambiance.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Warm-up","e":"Il prépare la piste sans brûler l’énergie trop tôt."},{"i":"q346","p":"dj","m":"Lecture de piste","t":"single","q":"Vrai ou faux : Un DJ doit ignorer l’énergie de la salle.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Lecture de piste","e":"Un DJ doit lire la salle pour adapter son set."},{"i":"q347","p":"dj","m":"Énergie","t":"single","q":"Vrai ou faux : Un bon set peut alterner douceur, énergie et respiration.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Set équilibré","e":"La variété garde les danseurs connectés."},{"i":"q348","p":"expert","m":"Urban Kiz","t":"single","q":"Vrai ou faux : Urban Kiz = juste Kizomba moderne est une formulation trop simplifiée.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Nuance Urban Kiz","e":"L’Urban Kiz a ses codes, influences et débats propres."},{"i":"q349","p":"expert","m":"Technique","t":"single","q":"Vrai ou faux : le Tetris Style est un style identifié de l'Urban Kiz, pas seulement une métaphore.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Tetris Style","e":"Vrai. Annoncé le 11 mars 2025 par Val'R & Sarah comme une variation à l'intérieur de la famille Urban Kiz.","s":"The Kiz Lab"},{"i":"q350","p":"expert","m":"Débats","t":"single","q":"Vrai ou faux : Une app culturelle doit toujours parler en vérités fermées.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Formulation prudente","e":"Il faut garder des nuances quand l’histoire est discutée."},{"i":"q351","p":"mindset","m":"Respect","t":"single","q":"Vrai ou faux : La proximité donne tous les droits.","o":["Vrai","Toujours vrai","Réponse sans importance","Faux"],"c":[3],"k":"Respect","e":"La proximité rend le respect encore plus important."},{"i":"q352","p":"mindset","m":"Humilité","t":"single","q":"Vrai ou faux : Un bon danseur reste capable d’apprendre.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Humilité","e":"La progression durable demande humilité et écoute."},{"i":"q353","p":"mindset","m":"Transmission","t":"single","q":"Vrai ou faux : Transmettre, c’est seulement montrer des figures.","o":["Vrai","Faux","Toujours vrai","Réponse sans importance"],"c":[1],"k":"Transmission","e":"Transmettre demande aussi culture, pédagogie et responsabilité."},{"i":"q354","p":"evokeez","m":"LCM","t":"single","q":"Vrai ou faux : LCM peut être compris comme Musicalité, Créativité, Légèreté et Mindset.","o":["Faux","Ça dépend toujours du hasard","Vrai","Impossible à dire dans l’app"],"c":[2],"k":"LCM","e":"Ces piliers structurent une progression consciente."},{"i":"q355","p":"evokeez","m":"Pédagogie","t":"single","q":"Vrai ou faux : La musicalité doit attendre le niveau expert pour être travaillée.","o":["Vrai","Toujours vrai","Réponse sans importance","Faux"],"c":[3],"k":"Musicalité dès le début","e":"La musicalité peut être travaillée dès les premières étapes."},{"i":"q356","p":"pionniers","m":"Musique","t":"single","q":"Vrai ou faux : Eduardo Paím est souvent cité comme une figure majeure de la Kizomba musicale.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"Eduardo Paím","e":"Il est souvent présenté comme un pionnier musical important."},{"i":"q357","p":"pionniers","m":"France","t":"single","q":"Vrai ou faux : Laurent Yìshù est associé à la musicalité et à l’expression.","o":["Faux","Vrai","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[1],"k":"Laurent Yìshù","e":"Vrai. Il décrit lui-même la musicalité comme sa spécialité : faire correspondre la technique à la mélodie.","s":"Entretien Danse-mag"},{"i":"q358","p":"pionniers","m":"DJs","t":"single","q":"Vrai ou faux : Le DJ ne sert qu’à mettre du volume.","o":["Vrai","Toujours vrai","Faux","Réponse sans importance"],"c":[2],"k":"Rôle du DJ","e":"Le DJ construit une énergie et une histoire musicale."},{"i":"q359","p":"galactic","m":"Culture","t":"single","q":"Vrai ou faux : Les cartes culturelles rendent le quiz plus éducatif.","o":["Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app","Vrai"],"c":[3],"k":"Carte culturelle","e":"Elles donnent une mini-leçon après une bonne réponse."},{"i":"q360","p":"galactic","m":"Rétention","t":"single","q":"Vrai ou faux : Avoir plus de 300 questions peut aider à éviter la lassitude.","o":["Vrai","Faux","Ça dépend toujours du hasard","Impossible à dire dans l’app"],"c":[0],"k":"300+ questions","e":"Une grande banque rend les parties moins répétitives."},{"i":"s001","p":"decouverte","m":"Racines","t":"single","q":"Que signifie le mot « kizomba » en kimbundu ?","o":["Fête, célébration","Douceur","Étreinte","Retour au pays"],"c":[0],"k":"Kizomba","e":"Le kimbundu est une langue bantoue d'Angola. Le mot désigne d'abord la fête, le rassemblement — pas une technique de danse.","s":"Ambassade d'Angola · Wikipédia"},{"i":"s002","p":"decouverte","m":"Racines","t":"single","q":"À quelle période la musique kizomba apparaît-elle en Angola ?","o":["Fin des années 1970 et années 1980","Années 1950","Années 1930","Années 2000"],"c":[0],"k":"Années 1980","e":"Les sources situent son émergence entre la fin des années 1970 et les années 1980, autour de Luanda.","s":"Wikipédia · Ambassade d'Angola"},{"i":"s003","p":"culture","m":"Patrimoine","t":"single","q":"En avril 2024, le ministère angolais de la Culture a classé la Kizomba comme…","o":["Patrimoine culturel immatériel national","Sport national","Langue officielle","Marque déposée de l'État"],"c":[0],"k":"Patrimoine national","e":"La Kizomba et le Tchianda ont été déclarés patrimoine culturel immatériel national. La marimba et le quissanje ont été reconnus le même jour.","s":"ANGOP, avril 2024"},{"i":"s004","p":"culture","m":"Patrimoine","t":"single","q":"Quelle démarche l'Angola mène-t-il actuellement auprès de l'UNESCO au sujet de la Kizomba ?","o":["Une candidature au patrimoine immatériel de l'humanité","Une demande d'interdiction d'enseignement à l'étranger","Un dépôt de brevet","Une plainte contre les festivals européens"],"c":[0],"k":"Candidature UNESCO","e":"Le ministère angolais présente cette inscription comme un moyen de prévenir l'appropriation culturelle. La procédure est en cours.","s":"ANGOP / allAfrica, 2024-2026"},{"i":"s005","p":"pionniers","m":"Racines","t":"single","q":"Quelle formulation est la plus prudente au sujet d'Eduardo Paím ?","o":["Souvent présenté comme le père de la kizomba musicale","Inventeur unique et incontesté de la kizomba","Créateur de la danse kizomba","Fondateur du semba"],"c":[0],"k":"Eduardo Paím","e":"Il s'est lui-même décrit comme précurseur du genre, et l'ambassade d'Angola emploie « souvent présenté comme ». Une création musicale collective n'a jamais un seul auteur.","s":"Wikipédia · Ambassade d'Angola · Euronews 2019"},{"i":"s006","p":"pionniers","m":"Racines","t":"single","q":"Quel groupe Eduardo Paím a-t-il formé avec des camarades d'école ?","o":["SOS","Ngola Ritmos","Kassav'","Quatro Plus"],"c":[0],"k":"SOS","e":"Le groupe s'appelait d'abord Os Puros avant de devenir SOS. Son album « Luanda, Minha Banda » l'a fait connaître au Portugal au début des années 1990.","s":"Wikipédia"},{"i":"s007","p":"culture","m":"Semba","t":"single","q":"Quel groupe des années 1940-1950 est cité comme fondateur de la musique angolaise moderne, et donc du semba ?","o":["Ngola Ritmos","Irmãos Verdades","SOS","Afra Sound Stars"],"c":[0],"k":"Ngola Ritmos","e":"Le groupe de Liceu Vieira Dias est régulièrement cité comme le point de départ du semba moderne, avant sa montée en popularité dans les années 1950.","s":"Wikipédia · Bom Dia Kizomba"},{"i":"s008","p":"culture","m":"Zouk","t":"single","q":"Quel groupe des Antilles françaises crée le zouk au début des années 1980 ?","o":["Kassav'","Ngola Ritmos","Quatro Plus","Os Puros"],"c":[0],"k":"Kassav'","e":"Kassav' réunit des musiciens de Guadeloupe et de Martinique. Leur son circule vite vers l'Afrique lusophone et nourrit la kizomba naissante.","s":"Wikipédia · The Sound Atlas"},{"i":"s009","p":"culture","m":"Zouk","t":"single","q":"En créole antillais comme en kimbundu, « zouk » et « kizomba » renvoient tous deux à…","o":["L'idée de fête","Le nom d'un instrument","Un pas de danse précis","Un quartier de la capitale"],"c":[0],"k":"Fête","e":"Deux mots, deux langues, deux continents, une même idée de départ : la fête. Ni l'un ni l'autre ne désignait au départ une technique.","s":"Wikipédia · Ambassade d'Angola"},{"i":"s010","p":"expert","m":"Ghetto Zouk","t":"single","q":"Où et par qui le Ghetto Zouk a-t-il été nommé, à la fin des années 1990 ?","o":["Par des artistes d'origine capverdienne aux Pays-Bas","Par des DJs angolais à Luanda","Par des producteurs parisiens","Par Kassav' en Guadeloupe"],"c":[0],"k":"Ghetto Zouk","e":"Le groupe Quatro Plus — dont Nelson Freitas — et Johnny Ramos sont cités comme les auteurs du nom, au tournant des années 2000.","s":"Discovering Kizomba · Saida Dance"},{"i":"s011","p":"culture","m":"Artistes","t":"single","q":"À quel groupe fondateur du Ghetto Zouk Nelson Freitas est-il associé ?","o":["Quatro Plus","Kassav'","SOS","Irmãos Verdades"],"c":[0],"k":"Quatro Plus","e":"Cinq chanteurs d'origine capverdienne aux Pays-Bas. C'est de là que vient l'étiquette Ghetto Zouk, pas d'Angola.","s":"Discovering Kizomba"},{"i":"s012","p":"expert","m":"Ghetto Zouk","t":"single","q":"Quelle formulation est la plus exacte à propos du Ghetto Zouk ?","o":["C'est d'abord un genre musical, même s'il existe aussi une méthode de danse portant ce nom","C'est uniquement une danse","C'est un synonyme de kizomba","C'est un style de semba rapide"],"c":[0],"k":"Musique et méthode","e":"Le raccourci « c'est une musique, pas une danse » est utile mais incomplet : une méthode nommée Ghetto Zouk Dance existe bel et bien.","s":"Discovering Kizomba · Kizomba Prague"},{"i":"s013","p":"sensation","m":"Tarraxinha","t":"single","q":"De quel verbe portugais vient le mot « tarraxinha » ?","o":["Atarraxar, visser","Dançar, danser","Abraçar, enlacer","Tocar, jouer"],"c":[0],"k":"Atarraxar","e":"Tarraxa signifie « vis », tarraxinha « petite vis ». Le nom décrit le mouvement, pas l'ambiance.","s":"Discovering Kizomba · dictionnaire Priberam"},{"i":"s014","p":"sensation","m":"Tarraxinha","t":"single","q":"De quel genre la tarraxinha est-elle le plus souvent dite dérivée ?","o":["Du kuduro ralenti","De la kizomba","Du semba","Du zouk antillais"],"c":[0],"k":"Kuduro ralenti","e":"C'est une confusion très répandue. Plusieurs sources situent son origine dans le kuduro dont on baisse le tempo vers 80-100 BPM, et non dans la kizomba.","s":"Meu Semba · Rate Your Music · S-dances"},{"i":"s015","p":"sensation","m":"Tarraxinha","t":"single","q":"Quelle province angolaise est citée comme berceau de la tarraxinha ?","o":["Benguela","Luanda","Huambo","Cabinda"],"c":[0],"k":"Benguela","e":"À ses débuts, la tarraxinha a été critiquée en Angola pour son caractère jugé trop sensuel.","s":"Wikipédia"},{"i":"s016","p":"pionniers","m":"DJs","t":"single","q":"DJ Znobia est cité parmi les pionniers de quel univers sonore ?","o":["La tarraxinha et les productions électroniques angolaises","Le semba acoustique","Le zouk antillais","La morna capverdienne"],"c":[0],"k":"DJ Znobia","e":"Son nom revient avec ceux de DJ Massacres, DJ Nervoso et DJ N.K. dans la diffusion de ces sons entre Luanda et la périphérie de Lisbonne.","s":"Rate Your Music · Meu Semba"},{"i":"s017","p":"expert","m":"Tarraxo","t":"single","q":"Où la musique tarraxo apparaît-elle au début des années 2010 ?","o":["À Lisbonne, dans les communautés afro-portugaises","À Luanda","À Paris","À Rotterdam"],"c":[0],"k":"Tarraxo","e":"DJ BeBeDeRa et DJ Matabaya Moreira sont cités parmi les pionniers. Le tarraxo est donc largement une histoire européenne, contrairement à la tarraxinha.","s":"Wikipédia · Generation Bass"},{"i":"s018","p":"expert","m":"Urban Kiz","t":"single","q":"Quelle affirmation est la plus honnête sur la création de l'Urban Kiz ?","o":["Plusieurs personnes en revendiquent publiquement la création et les récits divergent","Curtis Seldon en est le créateur unique et reconnu","Enah Lebon en est le créateur unique et reconnu","Le style a été créé collectivement en Angola"],"c":[0],"k":"Récits concurrents","e":"Curtis Seldon et Enah Lebon se présentent tous deux publiquement comme créateur ou fondateur. Cette application ne tranche pas ce débat et t'invite à écouter les deux récits.","s":"Wikipédia · pages officielles des intéressés"},{"i":"s019","p":"expert","m":"Urban Kiz","t":"single","q":"Sur quoi les différents récits de l'Urban Kiz s'accordent-ils le plus ?","o":["Un développement à Paris dans les années 2010 et un nom fixé vers 2015","Une naissance à Luanda dans les années 1990","Une création au Cap-Vert","Une origine dans le semba de carnaval"],"c":[0],"k":"Paris, années 2010","e":"Les versions divergent sur les personnes, beaucoup moins sur le lieu et la période.","s":"Wikipédia · The Kiz Lab"},{"i":"s020","p":"expert","m":"Urban Kiz","t":"multi","q":"Avant que le nom « Urban Kiz » ne s'impose, quels noms ont circulé pour ce style ?","o":["Kizomba 2.0","New style kizomba","Kizomba fusion","Semba urbain"],"c":[0,1,2],"k":"Noms transitoires","e":"Aucun consensus n'existait sur le nom. Le besoin d'une identité distincte de la kizomba est justement ce qui a poussé à en choisir un.","s":"Wikipédia"},{"i":"s021","p":"culture","m":"PALOP","t":"multi","q":"Quels genres sont traditionnellement capverdiens ?","o":["Morna","Coladeira","Funaná","Semba"],"c":[0,1,2],"k":"Genres capverdiens","e":"Le semba est angolais. Confondre les répertoires capverdiens et angolais est l'erreur la plus fréquente sur les scènes européennes.","s":"Kizombalove · Wikipédia"},{"i":"s022","p":"culture","m":"Premiers pièges","t":"single","q":"Pourquoi beaucoup de gens croient-ils à tort que la kizomba vient du Cap-Vert ?","o":["Parce que des artistes et producteurs capverdiens occupent une grande place dans sa production actuelle","Parce que le mot kizomba est capverdien","Parce que la danse a été codifiée à Praia","Parce que Kassav' était capverdien"],"c":[0],"k":"Angola, pas Cap-Vert","e":"Le rayonnement capverdien est réel dans la production musicale contemporaine. Il ne déplace pas l'origine, qui reste angolaise.","s":"Kizombalove"},{"i":"s023","p":"galactic","m":"Débats","t":"single","q":"En Angola, quel terme est parfois employé pour désigner la danse pratiquée sur la musique kizomba ?","o":["Passada","Tarraxinha","Kuduro","Kabetula"],"c":[0],"k":"Passada","e":"Certaines voix angolaises soutiennent qu'il n'existe pas de « danse kizomba » à proprement parler, mais des pas de semba adaptés. Le débat reste ouvert et mérite d'être connu.","s":"Bom Dia Kizomba"},{"i":"s024","p":"galactic","m":"Débats","t":"single","q":"Un pratiquant affirme : « La kizomba vient uniquement du zouk. » Quelle réponse est la plus solide ?","o":["C'est incomplet : il faut aussi parler de l'Angola, du semba et du contexte de Luanda","C'est exact, le zouk explique tout","C'est faux, le zouk n'a joué aucun rôle","C'est un débat sans importance"],"c":[0],"k":"Métissage","e":"Le zouk de Kassav' a bien été une influence majeure. Mais la kizomba naît d'une rencontre avec le semba et la vie musicale angolaise d'après l'indépendance.","s":"Wikipédia · Ambassade d'Angola"},{"i":"s025","p":"culture","m":"Artistes","t":"single","q":"Quel artiste angolais est le plus souvent cité pour avoir fait connaître le semba à l'international ?","o":["Bonga","Nelson Freitas","C4 Pedro","Anselmo Ralph"],"c":[0],"k":"Bonga","e":"Barceló de Carvalho, dit Bonga. Les trois autres sont des figures importantes, mais d'autres univers et d'autres périodes.","s":"Wikipédia · Music In Africa"},{"i":"s026","p":"galactic","m":"Musique vs danse","t":"single","q":"À Luanda, que désigne « Kizomba Na Rua » ?","o":["Des rassemblements de kizomba dansée dans la rue","Un festival international payant","Une chaîne de radio","Une compétition télévisée"],"c":[0],"k":"Kizomba Na Rua","e":"Littéralement « la kizomba dans la rue ». La danse reste d'abord une pratique sociale de quartier, avant d'être un produit de festival.","s":"Wikipédia"},{"i":"s027","p":"expert","m":"Tetris Style","t":"single","q":"Quel couple est à l'origine du Tetris Style ?","o":["Val'R & Sarah","Curtis Seldon & Cherazad","Laurent Yìshù & Adeline","Félicien & Isabelle"],"c":[0],"k":"Val'R & Sarah","e":"Attention à l'orthographe : Val'R et Sarah. Le style circule beaucoup sous des graphies erronées.","s":"The Kiz Lab · Kiz Dance Journal"},{"i":"s028","p":"expert","m":"Tetris Style","t":"single","q":"En quelle année le Tetris Style a-t-il été annoncé publiquement ?","o":["2025","2013","2018","2021"],"c":[0],"k":"Tetris Style, 2025","e":"Annoncé le 11 mars 2025 comme une variation à l'intérieur de la famille Urban Kiz — pas comme une danse séparée.","s":"The Kiz Lab"},{"i":"s029","p":"expert","m":"Tetris Style","t":"single","q":"Comment le Tetris Style est-il présenté par ses créateurs ?","o":["Un équilibre entre la marche de la Kizomba et le mode « Tetris » de l'Urban Kiz","Un style angolais traditionnel","Une méthode de Tarraxinha","Un genre musical"],"c":[0],"k":"Marche et Tetris","e":"D'où le nom : des placements qui s'emboîtent, avec des variations proches de la logique du jeu.","s":"Page officielle Tetris Style · The Kiz Lab"},{"i":"s030","p":"expert","m":"Tetris Style","t":"multi","q":"Sur quoi le Tetris Style insiste-t-il particulièrement ?","o":["Le cadre","Le guidage précis","Les placements et la qualité d'exécution","L'improvisation sans structure"],"c":[0,1,2],"k":"Précision","e":"Les stages annoncent placements, connexions, précision des appuis, contrôle du corps et gestion des directions. C'est un style de technicité, pas de relâchement.","s":"Programmes de stages Val'R & Sarah"},{"i":"s031","p":"evokeez","m":"Pédagogie","t":"single","q":"Quelle est la spécialité revendiquée par Laurent Yìshù dans son enseignement ?","o":["La musicalité","Les portés acrobatiques","La Tarraxinha","Le Semba de carnaval"],"c":[0],"k":"Musicalité","e":"Il la décrit lui-même comme sa spécialité : faire correspondre la technique à la mélodie, une approche peu courante dans le milieu à ses débuts.","s":"Entretien Danse-mag"},{"i":"s032","p":"evokeez","m":"Pédagogie","t":"single","q":"Quelle compétition Laurent Yìshù et Adeline ont-ils remportée en 2013 ?","o":["Le France Kizomba Tour","Le championnat du monde de Semba","Les Olympiads of Kizomba","Le Africadancar de Lisbonne"],"c":[0],"k":"France Kizomba Tour 2013","e":"Le championnat national français de kizomba. Cette victoire leur a donné la visibilité qui a lancé leur carrière internationale.","s":"Entretien Danse-mag · Kizomba World"},{"i":"s033","p":"evokeez","m":"Pédagogie","t":"single","q":"Sous quel nom le duo formé par Laurent Yìshù et Adeline était-il connu ?","o":["L&A Kizomba","Evokeez","Tetris Style","SYS Crew"],"c":[0],"k":"L&A Kizomba","e":"Ils ont enseigné et voyagé ensemble de 2012 à fin 2017. Le partenariat professionnel a pris fin au 1er janvier 2018.","s":"Kizomba World · Entretien Danse-mag"},{"i":"s034","p":"evokeez","m":"Transmission","t":"single","q":"Quel tournant Laurent Yìshù décrit-il dans sa carrière après 2018 ?","o":["Passer de professeur à formateur de professeurs","Arrêter la danse","Devenir DJ à plein temps","Quitter la France"],"c":[0],"k":"Formateur","e":"Son objectif déclaré devient de former la génération suivante d'enseignants plutôt que de tourner en festival.","s":"Entretien Danse-mag"},{"i":"s035","p":"evokeez","m":"Evokeez","t":"single","q":"Avec qui Laurent Yìshù forme-t-il le duo associé à Evokeez Paris ?","o":["Sophie Madison","Adeline","Sarah","Carolina"],"c":[0],"k":"Sophie Madison","e":"Orthographe à retenir : Madison. Ils animent ensemble les émissions produites par Evokeez Paris.","s":"Evokeez Paris · Instagram des intéressés"},{"i":"s036","p":"evokeez","m":"Evokeez","t":"single","q":"Quel dispositif Evokeez a-t-il mis en place pour situer le niveau des danseurs ?","o":["Un système de bracelets","Un examen écrit","Un classement par points","Un diplôme d'État"],"c":[0],"k":"Bracelets Evokeez","e":"Présenté par l'école comme un cadre assumé plutôt qu'une autorité imposée. Le sujet du niveau et des « profs auto-proclamés » est un débat vif de la scène.","s":"Émission Evokeez Paris"},{"i":"s037","p":"pionniers","m":"France","t":"single","q":"Quelle formulation est la plus prudente au sujet des figures françaises de la Kizomba ?","o":["Ce sont des professeurs reconnus, dont les rôles exacts se documentent au cas par cas","Ce sont les créateurs officiels de la danse","Ce sont les seuls détenteurs de la technique","Leur rôle n'a aucune importance historique"],"c":[0],"k":"Prudence","e":"Un professeur peut être majeur pour une scène sans être fondateur d'un style. Les deux choses se documentent séparément.","s":"Principe éditorial de l'application"},{"i":"s038","p":"galactic","m":"Débats","t":"single","q":"Un style comme le Tetris Style apparaît. Quelle lecture est la plus juste ?","o":["Les styles continuent d'apparaître : la scène est vivante, pas figée","Tout nouveau style trahit les racines","Seuls les styles angolais sont légitimes","Un style né après 2020 n'a aucune valeur"],"c":[0],"k":"Scène vivante","e":"La kizomba n'a jamais cessé de bouger depuis Luanda. Reconnaître les racines et accueillir les évolutions ne sont pas contradictoires.","s":"Principe éditorial de l'application"},{"i":"s040","p":"pionniers","m":"Transmission","t":"single","q":"Quel est le vrai nom de Mestre Petchu ?","o":["Pedro Vieira Dias Tomás","Joel Évora","Barceló de Carvalho","Liceu Vieira Dias"],"c":[0],"k":"Mestre Petchu","e":"Né à Luanda, installé au Portugal depuis les années 1990. Il raconte avoir commencé à danser en 1978, d'abord dans un groupe de semba de carnaval.","s":"Diário de Notícias · Danças do Mundo"},{"i":"s041","p":"pionniers","m":"Transmission","t":"single","q":"Selon son propre témoignage, quel lien de famille Mestre Petchu a-t-il avec Liceu Vieira Dias ?","o":["Liceu Vieira Dias est son grand-oncle","Aucun, ce sont des homonymes","C'est son père","C'est son élève"],"c":[0],"k":"Une même famille","e":"Le fondateur de Ngola Ritmos, à la racine du semba moderne, et l'homme qui a structuré son enseignement en Europe sont de la même famille. Petchu le dit lui-même en interview.","s":"Diário de Notícias"},{"i":"s042","p":"pionniers","m":"Transmission","t":"single","q":"Qu'appelle-t-on la « géométrie de la kizomba » attribuée à Mestre Petchu ?","o":["Décomposer et nommer les mouvements pour pouvoir les enseigner","Une figure acrobatique","Un style de musique","Un système de notation des BPM"],"c":[0],"k":"Géométrie de la kizomba","e":"Une tentative de décrire la danse de façon structurée, en découpant les mouvements et en leur donnant des noms. C'est ce qui a rendu possible l'enseignement en studio.","s":"Kizomba Classes · ALC Dance"},{"i":"s043","p":"pionniers","m":"Transmission","t":"single","q":"Quelle compagnie de danse traditionnelle angolaise Mestre Petchu a-t-il fondée ?","o":["Ballet Tradicional Kilandukilu","Ngola Ritmos","Fenômenos do Semba","Kizombalove"],"c":[0],"k":"Kilandukilu","e":"Une des principales compagnies de danse d'Angola, avec une antenne au Portugal, active depuis plus de vingt-cinq ans.","s":"Danças do Mundo · Kizomba-World"},{"i":"s044","p":"pionniers","m":"Transmission","t":"single","q":"Quelle distinction Mestre Petchu a-t-il reçue en 2024 ?","o":["Le Prix national angolais de la Culture et des Arts, catégorie Danse","Un disque d'or","Le titre de champion du monde","Un prix UNESCO"],"c":[0],"k":"Prix national 2024","e":"Une reconnaissance officielle par son propre pays — ce qui est rare pour un enseignant de danse, et pas seulement pour un artiste de scène.","s":"Robb Report Africa, 2025"},{"i":"s045","p":"pionniers","m":"Transmission","t":"single","q":"Quelle formulation est la plus prudente sur l'arrivée de la kizomba au Portugal ?","o":["Mestre Petchu figure parmi les premiers à l'y enseigner, avec Zé Barbosa, à la fin des années 1990","Mestre Petchu a inventé la kizomba","Personne ne l'enseignait avant 2000","La kizomba est née au Portugal"],"c":[0],"k":"Portugal, fin des années 1990","e":"Plusieurs noms circulent pour cette période. Dire « parmi les premiers » est exact ; dire « le premier » demanderait une source qui n'existe pas.","s":"Urban Travelite · ALC Dance"},{"i":"s046","p":"evokeez","m":"Formation","t":"single","q":"En quelle année José N'dongala a-t-il fondé la Kizombalove Academy ?","o":["2006","1998","2012","2016"],"c":[0],"k":"Kizombalove Academy","e":"En Belgique. L'académie se présente comme la première école de kizomba et semba du Benelux.","s":"Kizombalove · Plaisirs d'été"},{"i":"s047","p":"evokeez","m":"Formation","t":"single","q":"Qu'a lancé José N'dongala en janvier 2012 ?","o":["Un syllabus officiel de formation de professeurs de kizomba","Un label de musique","Un festival à Luanda","Une chaîne de télévision"],"c":[0],"k":"Syllabus 2012","e":"Structurer la formation des enseignants était alors une nouveauté. Beaucoup d'écoles européennes s'en sont inspirées ensuite.","s":"Kizombalove"},{"i":"s048","p":"galactic","m":"Débats","t":"single","q":"Comment traiter l'affirmation « José N'dongala est le premier promoteur officiel de la kizomba en Belgique » ?","o":["Comme une auto-description, à attribuer à sa source","Comme un fait établi par des historiens","Comme une invention sans fondement","Comme une donnée officielle de l'État belge"],"c":[0],"k":"Auto-description","e":"Cette phrase vient de son propre syllabus. Elle est parfaitement légitime à citer — à condition de dire qui la formule. C'est la règle pour toutes les revendications de « premier ».","s":"Syllabus Kizombalove"},{"i":"s049","p":"evokeez","m":"Formation","t":"single","q":"Qui dirige la Kizombalove Academy depuis 2014 ?","o":["Frans & Sarah","José N'dongala seul","Mestre Petchu","Laurent Yìshù"],"c":[0],"k":"Frans & Sarah","e":"Formés dans l'académie à partir de 2008, ils en ont repris la direction. Frans s'est spécialisé en semba, Sarah en ginga.","s":"Festival Afrodisiac · Plaisirs d'été"},{"i":"s050","p":"galactic","m":"Débats","t":"single","q":"Quelle difficulté José N'dongala reconnaît-il lui-même dans son syllabus ?","o":["Le manque de sources écrites fiables sur l'histoire angolaise","Le manque d'élèves","La difficulté de trouver des salles","Le coût des déplacements"],"c":[0],"k":"Tradition orale","e":"Il rappelle que les racines littéraires angolaises sont orales et n'ont été mises par écrit que tardivement, et que la censure d'après l'indépendance a limité le reste. C'est exactement pour ça qu'il faut rester prudent.","s":"Syllabus Kizombalove"},{"i":"s051","p":"culture","m":"Artistes","t":"single","q":"Où Nelson Freitas est-il né ?","o":["À Rotterdam, de parents capverdiens","À Praia, au Cap-Vert","À Luanda","À Lisbonne"],"c":[0],"k":"Nelson Freitas","e":"Le Ghetto Zouk est né dans la diaspora, pas sur l'archipel. C'est une histoire d'enfants d'immigrés aux Pays-Bas.","s":"Wikipédia"},{"i":"s052","p":"culture","m":"Artistes","t":"multi","q":"Quels artistes formaient le groupe Quatro Plus avec Nelson Freitas ?","o":["Nilton Ramalho","Nelson Oliveira","Adilson Ben David","C4 Pedro"],"c":[0,1,2],"k":"Quatro Plus","e":"C4 Pedro est angolais et d'une autre génération. Il a collaboré avec Nelson Freitas, mais n'a jamais fait partie de Quatro Plus.","s":"Wikipédia · Discovering Kizomba"},{"i":"s053","p":"dj","m":"Artistes","t":"single","q":"Quel est le vrai nom d'Elji Beatzkilla ?","o":["Joel Évora","Pedro Vieira Dias Tomás","Barceló de Carvalho","Nilton Ramalho"],"c":[0],"k":"Elji Beatzkilla","e":"Producteur et chanteur franco-capverdien né à Nice de parents capverdiens. Il est surtout connu comme producteur, plus que comme DJ de soirée.","s":"Deezer · Vinyl Me Please"},{"i":"s054","p":"dj","m":"Artistes","t":"single","q":"Quel titre de 2014 a établi la réputation d'Elji Beatzkilla dans l'univers kizomba ?","o":["Dança Kizomba","Miúda Linda","Luanda, Minha Banda","Bo Tem Mel"],"c":[0],"k":"Dança Kizomba","e":"Chanté en créole capverdien, autour de 89 BPM. Le morceau a circulé bien au-delà des soirées kizomba.","s":"Deezer · Tropical Bass"},{"i":"s055","p":"dj","m":"BPM","t":"single","q":"Dans quelle fourchette de tempo se situe généralement la tarraxinha ?","o":["Environ 80 à 100 BPM","120 à 140 BPM","60 à 70 BPM","150 BPM et plus"],"c":[0],"k":"80-100 BPM","e":"C'est précisément en ralentissant le kuduro vers cette zone que le style est apparu. Le tempo n'est pas un détail : c'est l'acte de naissance du genre.","s":"Rate Your Music · S-dances"},{"i":"s056","p":"expert","m":"Ghetto Zouk","t":"single","q":"À qui la méthode « Ghetto Zouk Dance » est-elle attribuée ?","o":["Vitor Tavares Mendes","Nelson Freitas","Mestre Petchu","Curtis Seldon"],"c":[0],"k":"Ghetto Zouk Dance","e":"Un éducateur portugais aux racines capverdiennes. C'est cette méthode qui empêche de dire sans nuance que le Ghetto Zouk n'est « qu'une musique ».","s":"Kizomba Prague"},{"i":"s057","p":"mindset","m":"Humilité","t":"single","q":"Une revendication de « premier » ou de « créateur » circule dans la scène. Quel réflexe est le plus sain ?","o":["Chercher qui la formule, et à quelle date","La croire si la personne est connue","La rejeter systématiquement","Ne jamais en parler"],"c":[0],"k":"Attribuer, toujours","e":"La plupart de ces phrases viennent des intéressés eux-mêmes. Les citer en nommant leur auteur est honnête. Les répéter comme des faits ne l'est pas.","s":"Méthode appliquée dans cette application"}];
 
+/* ============ LANGUES ============
+   Une seule app, deux langues. La langue est détectée au premier lancement
+   puis mémorisée. Les questions non encore traduites s'affichent en français
+   avec une mention : rien ne casse jamais. */
+const DICT = {
+  fr:{
+    nav_home:"Accueil", nav_packs:"Packs", nav_cards:"Cartes", nav_infos:"Culture",
+    sound:"Activer le son d'ambiance", tagline_1:"Quiz", tagline_2:"Kizomba", tagline_3:"Urban",
+    hero_p:"La culture, les racines et les évolutions. Sans trancher les débats à la place de personne.",
+    daily:"☀️ Quiz du jour — 5 questions", daily_again:"☀️ Quiz du jour — refaire",
+    done_today:"✓ Fait aujourd'hui", todo_today:"À faire aujourd'hui",
+    streak:"série de", day:"jour", days:"jours", record:"record",
+    pick_pack:"Choisir un pack", to_next:"encore", before:"XP avant", maxed:"palier maximum atteint",
+    mastered:"Maîtrisées", cards:"Cartes", badges:"Badges",
+    packs_eyebrow:"Neuf parcours", packs_title:"Choisis ton terrain",
+    xp_needed:"XP requis", questions:"questions", of_total:"au total", full:"★ Maîtrisé",
+    empty_session:"Session vide. Reviens aux packs.",
+    multi:"◆ Plusieurs bonnes réponses", validate:"Valider", quit:"Quitter",
+    next_q:"Question suivante", see_result:"Voir le résultat",
+    good:"Bien vu", bad:"Pas tout à fait", source:"Source",
+    report:"Cette question te semble fausse ? Signale-la.",
+    not_translated:"Traduction en cours — affichée en français",
+    score:"Score", xp_won:"XP gagnés", success:"Réussite",
+    new_cards:"Nouvelles cartes", recap:"Ce que tu retiens",
+    replay:"Rejouer ce pack", my_cards:"Mes cartes", collection:"Ma collection",
+    unlocked:"débloquée", unlockeds:"débloquées", card:"carte", cardp:"cartes",
+    badge_title:"Badges de maîtrise",
+    no_badge:"Aucun badge pour l'instant. Réponds juste à la moitié des questions d'un pack pour décrocher le premier.",
+    no_card:"Aucune carte pour l'instant.<br>Chaque bonne réponse inédite en débloque une.",
+    start:"Commencer", reset:"Remettre la progression à zéro",
+    infos_eyebrow:"La règle de la maison", infos_title:"Culture, pas verdict",
+    does_t:"Ce que cette app fait",
+    does_b:"Elle transmet des repères sur la Kizomba, le Semba, l'Urban Kiz, le Tarraxo, la Tarraxinha et le Ghetto Zouk. Elle sépare toujours ce qui relève de la musique de ce qui relève de la danse.",
+    not_t:"Ce qu'elle ne fait pas",
+    not_b:"Elle ne tranche pas les débats de la scène. Sur les origines de l'Urban Kiz, sur les rôles de chacun, sur la frontière entre Tarraxinha et Tarraxo, elle dit « souvent présenté comme » et laisse la discussion ouverte.",
+    wrong_t:"Une question te semble fausse ?",
+    wrong_b:"Elle l'est peut-être. Les récits de scène se contredisent et cette app n'est pas au-dessus. Écris-nous et on corrige, source à l'appui.",
+    write_us:"Nous écrire", themes:"Thèmes", confirm_reset:"Remettre les XP et les cartes à zéro ?",
+    locked:"Pack verrouillé. Encore", xp_left:"XP.", pick_one:"Choisis au moins une réponse.",
+    saved_fail:"Progression non enregistrée : stockage indisponible.",
+    no_audio:"Ambiance indisponible. Ajoute kizomba-loop.mp3 à la racine du site.",
+    card_saved:"Carte enregistrée dans tes téléchargements.", soon:"Ce pack arrive bientôt.",
+    reset_done:"Progression remise à zéro.", cult_card:"CARTE CULTURELLE"
+  },
+  en:{
+    nav_home:"Home", nav_packs:"Packs", nav_cards:"Cards", nav_infos:"Culture",
+    sound:"Turn on ambient sound", tagline_1:"Quiz", tagline_2:"Kizomba", tagline_3:"Urban",
+    hero_p:"The culture, the roots and how they changed. Without settling the scene's arguments for you.",
+    daily:"☀️ Daily quiz — 5 questions", daily_again:"☀️ Daily quiz — play again",
+    done_today:"✓ Done today", todo_today:"Not done today",
+    streak:"streak of", day:"day", days:"days", record:"best",
+    pick_pack:"Choose a pack", to_next:"another", before:"XP to", maxed:"top level reached",
+    mastered:"Mastered", cards:"Cards", badges:"Badges",
+    packs_eyebrow:"Nine journeys", packs_title:"Pick your ground",
+    xp_needed:"XP needed", questions:"questions", of_total:"in total", full:"★ Mastered",
+    empty_session:"Empty session. Head back to the packs.",
+    multi:"◆ More than one right answer", validate:"Check", quit:"Leave",
+    next_q:"Next question", see_result:"See result",
+    good:"Nailed it", bad:"Not quite", source:"Source",
+    report:"Think this one is wrong? Flag it.",
+    not_translated:"Translation in progress — shown in French",
+    score:"Score", xp_won:"XP earned", success:"Correct",
+    new_cards:"New cards", recap:"What you take away",
+    replay:"Play this pack again", my_cards:"My cards", collection:"My collection",
+    unlocked:"unlocked", unlockeds:"unlocked", card:"card", cardp:"cards",
+    badge_title:"Mastery badges",
+    no_badge:"No badge yet. Answer half of a pack's questions to earn your first one.",
+    no_card:"No cards yet.<br>Every first-time correct answer unlocks one.",
+    start:"Start", reset:"Reset all progress",
+    infos_eyebrow:"House rules", infos_title:"Culture, not verdicts",
+    does_t:"What this app does",
+    does_b:"It teaches landmarks about Kizomba, Semba, Urban Kiz, Tarraxo, Tarraxinha and Ghetto Zouk. It always separates what is music from what is dance.",
+    not_t:"What it does not do",
+    not_b:"It does not settle the scene's arguments. On the origins of Urban Kiz, on who did what, on where Tarraxinha ends and Tarraxo begins, it says \"often described as\" and leaves the discussion open.",
+    wrong_t:"Think a question is wrong?",
+    wrong_b:"It might be. Scene accounts contradict each other and this app is no exception. Write to us and we will fix it, with a source.",
+    write_us:"Write to us", themes:"Themes", confirm_reset:"Reset XP and cards to zero?",
+    locked:"Pack locked. Another", xp_left:"XP to go.", pick_one:"Pick at least one answer.",
+    saved_fail:"Progress not saved: storage unavailable.",
+    no_audio:"Ambient sound unavailable. Add kizomba-loop.mp3 to the site root.",
+    card_saved:"Card saved to your downloads.", soon:"This pack is coming soon.",
+    reset_done:"Progress reset.", cult_card:"CULTURE CARD"
+  }
+};
+let LANG = "fr";
+const t = k => (DICT[LANG] && DICT[LANG][k]) || DICT.fr[k] || k;
+/* champ traduit d'un objet : title -> title_en si dispo */
+const tf = (o,f) => (LANG === "en" && o[f+"_en"]) ? o[f+"_en"] : o[f];
+/* question traduite : q.en écrase les champs si la traduction existe */
+const tq = q => (LANG === "en" && q.en) ? Object.assign({}, q, q.en) : q;
+
 const LEVELS = [
-  {name:"Rookie",         min:0,   emoji:"🌱"},
-  {name:"Danseur",        min:120, emoji:"🕺"},
-  {name:"Groove OG",      min:260, emoji:"🔥"},
-  {name:"Galactic",       min:450, emoji:"🚀"},
-  {name:"Master Galactic",min:800, emoji:"🦁"}
+  {name:"Rookie",          name_en:"Rookie",          min:0,   emoji:"🌱"},
+  {name:"Danseur",         name_en:"Dancer",          min:120, emoji:"🕺"},
+  {name:"Groove OG",       name_en:"Groove OG",       min:260, emoji:"🔥"},
+  {name:"Galactic",        name_en:"Galactic",        min:450, emoji:"🚀"},
+  {name:"Master Galactic", name_en:"Master Galactic", min:800, emoji:"🦁"}
 ];
 
 const PACKS = [
-  {id:"decouverte",title:"Découverte",emoji:"🌙",lvl:"Facile",unlock:0,  size:8, desc:"Bases, styles et premiers repères."},
-  {id:"sensation", title:"Sensation", emoji:"✨",lvl:"Moyen", unlock:120,size:8, desc:"Douceur, flow, Tarraxinha, Tarraxo, contrôle."},
-  {id:"culture",   title:"Culture",   emoji:"🌍",lvl:"Moyen", unlock:160,size:8, desc:"Racines afro-lusophones, artistes, influences."},
-  {id:"dj",        title:"DJ Kizomba",emoji:"🎧",lvl:"Moyen", unlock:220,size:8, desc:"Lecture de piste, warm-up, transitions, énergie."},
-  {id:"expert",    title:"Expert",    emoji:"⚡",lvl:"Difficile",unlock:260,size:8,desc:"Urban Kiz, Ghetto Zouk, nuances et débats."},
-  {id:"mindset",   title:"Mindset",   emoji:"🧭",lvl:"Moyen", unlock:320,size:8, desc:"Respect, consentement, humilité, transmission."},
-  {id:"evokeez",   title:"Evokeez",   emoji:"💫",lvl:"Difficile",unlock:380,size:8,desc:"Musicalité, créativité, légèreté, pédagogie."},
-  {id:"pionniers", title:"Pionniers", emoji:"👑",lvl:"Difficile",unlock:450,size:8,desc:"Figures, DJs et récits de scène — avec nuance."},
-  {id:"galactic",  title:"Galactic",  emoji:"🚀",lvl:"Ultime", unlock:600,size:8, desc:"Le dernier palier. Nuance obligatoire."}
+  {id:"decouverte",title:"Découverte",title_en:"Discovery",emoji:"🌙",lvl:"Facile",lvl_en:"Easy",unlock:0,size:8,
+   desc:"Bases, styles et premiers repères.", desc_en:"Basics, styles and first landmarks."},
+  {id:"sensation", title:"Sensation", title_en:"Feel",     emoji:"✨",lvl:"Moyen",lvl_en:"Medium",unlock:120,size:8,
+   desc:"Douceur, flow, Tarraxinha, Tarraxo, contrôle.", desc_en:"Softness, flow, Tarraxinha, Tarraxo, control."},
+  {id:"culture",   title:"Culture",   title_en:"Culture",  emoji:"🌍",lvl:"Moyen",lvl_en:"Medium",unlock:160,size:8,
+   desc:"Racines afro-lusophones, artistes, influences.", desc_en:"Afro-Lusophone roots, artists, influences."},
+  {id:"dj",        title:"DJ Kizomba",title_en:"DJ Kizomba",emoji:"🎧",lvl:"Moyen",lvl_en:"Medium",unlock:220,size:8,
+   desc:"Lecture de piste, warm-up, transitions, énergie.", desc_en:"Reading the floor, warm-up, transitions, energy."},
+  {id:"expert",    title:"Expert",    title_en:"Expert",   emoji:"⚡",lvl:"Difficile",lvl_en:"Hard",unlock:260,size:8,
+   desc:"Urban Kiz, Ghetto Zouk, nuances et débats.", desc_en:"Urban Kiz, Ghetto Zouk, nuance and arguments."},
+  {id:"mindset",   title:"Mindset",   title_en:"Mindset",  emoji:"🧭",lvl:"Moyen",lvl_en:"Medium",unlock:320,size:8,
+   desc:"Respect, consentement, humilité, transmission.", desc_en:"Respect, consent, humility, passing it on."},
+  {id:"evokeez",   title:"Evokeez",   title_en:"Evokeez",  emoji:"💫",lvl:"Difficile",lvl_en:"Hard",unlock:380,size:8,
+   desc:"Musicalité, créativité, légèreté, pédagogie.", desc_en:"Musicality, creativity, lightness, teaching."},
+  {id:"pionniers", title:"Pionniers", title_en:"Pioneers", emoji:"👑",lvl:"Difficile",lvl_en:"Hard",unlock:450,size:8,
+   desc:"Figures, DJs et récits de scène — avec nuance.", desc_en:"Figures, DJs and scene accounts — with nuance."},
+  {id:"galactic",  title:"Galactic",  title_en:"Galactic", emoji:"🚀",lvl:"Ultime",lvl_en:"Ultimate",unlock:600,size:8,
+   desc:"Le dernier palier. Nuance obligatoire.", desc_en:"The final tier. Nuance required."}
 ];
 
 /* ⚠️ REMPLACE cette adresse par la tienne. C'est la seule ligne à changer
    pour que le bouton « Signaler une erreur » fonctionne. */
 const CONTACT = "contact@kizflowstudio.com";
 
-const K = {xp:"kizombaUrban_xp_v3", cards:"kizombaUrban_cards_v3", seen:"kizombaUrban_seen_v3", daily:"kizombaUrban_daily_v3"};
+const K = {xp:"kizombaUrban_xp_v3", cards:"kizombaUrban_cards_v3", seen:"kizombaUrban_seen_v3", daily:"kizombaUrban_daily_v3", lang:"kizombaUrban_lang_v1"};
 
 /* Deux paliers seulement. Un badge qu'on obtient tout le temps ne vaut rien. */
 const BADGE_TIERS = [
@@ -481,8 +597,15 @@ function read(key, fallback){
 }
 function write(key, value){
   try{ localStorage.setItem(key, JSON.stringify(value)); return true; }
-  catch(e){ toast("Progression non enregistrée : stockage indisponible."); return false; }
+  catch(e){ toast(t("saved_fail")); return false; }
 }
+
+LANG = (() => {
+  const saved = read(K.lang, null);
+  if(saved === "fr" || saved === "en") return saved;
+  const nav = ((navigator.languages && navigator.languages[0]) || navigator.language || "fr").toLowerCase();
+  return nav.startsWith("fr") ? "fr" : "en";
+})();
 
 let S = {
   page:"home",
@@ -572,6 +695,25 @@ function reportLink(q){
          "&body=" + encodeURIComponent(corps);
 }
 
+function setLang(code){
+  if(code === LANG) return;
+  LANG = code; write(K.lang, code);
+  document.documentElement.lang = code;
+  document.getElementById("sndBtn").setAttribute("aria-label", t("sound"));
+  document.querySelectorAll("#nav button").forEach(b => {
+    const lbl = b.querySelector("em"); if(lbl) lbl.textContent = t("nav_" + b.dataset.go);
+  });
+  document.querySelectorAll("#langBtn button").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.lang === code)));
+  /* si on est en pleine partie, on redistribue les questions dans la nouvelle
+     langue en gardant l'ordre, et on remet la question en cours à zéro */
+  if(S.queue.length){
+    S.queue = S.queue.map(x => dealQuestion(tq(QUESTIONS.find(y => y.i === x.i) || x)));
+    S.picked = []; S.done = false; S.ok = false;
+  }
+  render();
+}
+
 let toastTimer;
 function toast(msg){
   document.querySelectorAll(".toast").forEach(n => n.remove());
@@ -590,7 +732,7 @@ document.getElementById("sndBtn").addEventListener("click", function(){
   const p = amb.play();
   if(p && p.catch){
     p.then(() => { S.sound = true; this.setAttribute("aria-pressed","true"); })
-     .catch(() => toast("Ambiance indisponible. Ajoute kizomba-loop.mp3 à la racine du site."));
+     .catch(() => toast(t("no_audio")));
   }
 });
 
@@ -614,11 +756,11 @@ function startPack(id){
   const pack = packOf(id);
   if(!pack) return;
   if(S.xp < pack.unlock){
-    toast("Pack verrouillé. Encore " + (pack.unlock - S.xp) + " XP.");
+    toast(t("locked") + " " + (pack.unlock - S.xp) + " " + t("xp_left"));
     return go("packs");
   }
   const pool = poolOf(id);
-  if(!pool.length) return toast("Ce pack arrive bientôt.");
+  if(!pool.length) return toast(t("soon"));
 
   /* CORRECTIF 4 — on ne demande jamais plus de questions qu'il n'en existe.
      On sert d'abord celles jamais vues, pour que rejouer ait un intérêt.    */
@@ -627,7 +769,7 @@ function startPack(id){
   const size   = Math.min(pack.size, pool.length);
 
   S.pack = pack;
-  S.queue = unseen.concat(rest).slice(0, size).map(dealQuestion);
+  S.queue = unseen.concat(rest).slice(0, size).map(q => dealQuestion(tq(q)));
   S.idx = 0; S.picked = []; S.done = false; S.ok = false;
   S.score = 0; S.gained = 0; S.fresh = []; S.log = [];
   go("quiz");
@@ -645,7 +787,7 @@ function startDaily(){
     if(!picked.some(x => x.i === q.i)) picked.push(q); else n--;
   }
   S.pack = {id:"daily", title:"Quiz du jour", emoji:"☀️", size:5};
-  S.queue = picked.map(dealQuestion);
+  S.queue = picked.map(q => dealQuestion(tq(q)));
   S.idx = 0; S.picked = []; S.done = false; S.ok = false;
   S.score = 0; S.gained = 0; S.fresh = []; S.log = [];
   go("quiz");
@@ -665,7 +807,7 @@ function pick(i){
 
 function validate(){
   if(S.done) return;
-  if(!S.picked.length) return toast("Choisis au moins une réponse.");
+  if(!S.picked.length) return toast(t("pick_one"));
   const q = S.queue[S.idx];
   const right = S.picked.length === q.c.length && S.picked.slice().sort().every((v,k) => v === q.c.slice().sort()[k]);
 
@@ -699,10 +841,10 @@ function next(){
 }
 
 function resetAll(){
-  if(!confirm("Remettre les XP et les cartes à zéro ?")) return;
+  if(!confirm(t("confirm_reset"))) return;
   try{ [K.xp,K.cards,K.seen].forEach(k => localStorage.removeItem(k)); }catch(e){}
   S.xp = 0; S.cards = []; S.seen = [];
-  toast("Progression remise à zéro.");
+  toast(t("reset_done"));
   go("home");
 }
 
@@ -776,7 +918,7 @@ function drawShare(c, tex){
   x.textAlign = "center";
   x.fillStyle = "#2FE0C8";
   x.font = "600 26px 'Instrument Sans', system-ui, sans-serif";
-  x.fillText("CARTE CULTURELLE", W/2, 190);
+  x.fillText(t("cult_card"), W/2, 190);
 
   x.font = "82px system-ui, sans-serif";
   x.fillText(c.emoji || "✦", W/2, 330);
@@ -810,7 +952,7 @@ function drawShare(c, tex){
     const a = document.createElement("a");
     a.href = url; a.download = "kizomba-urban-quiz.png"; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 3000);
-    toast("Carte enregistrée dans tes téléchargements.");
+    toast(t("card_saved"));
   }, "image/png");
 }
 
@@ -823,50 +965,50 @@ function viewHome(){
   const streak = S.daily.streak;
   return `
   <section class="hero">
-    <h1><em>Quiz</em>Kizomba<br>Urban</h1>
-    <p>La culture, les racines et les évolutions. Sans trancher les débats à la place de personne.</p>
+    <h1><em>${t("tagline_1")}</em>${t("tagline_2")}<br>${t("tagline_3")}</h1>
+    <p>${t("hero_p")}</p>
     <div class="tempo">
       <span class="tempo-lbl">85 BPM</span>
       <span class="tempo-track"></span>
       <span class="tempo-lbl">1·2·3·4</span>
     </div>
-    <button class="btn gold" data-act="daily">${doneToday ? "☀️ Quiz du jour — refaire" : "☀️ Quiz du jour — 5 questions"}</button>
-    ${streak > 0 ? `<p class="streak">${doneToday ? "✓ Fait aujourd'hui" : "À faire aujourd'hui"} · série de <b>${streak}</b> jour${streak>1?"s":""}${S.daily.best>streak?` · record ${S.daily.best}`:""}</p>` : ""}
-    <div class="btn-row"><button class="btn ghost" data-act="packs">Choisir un pack</button></div>
+    <button class="btn gold" data-act="daily">${doneToday ? t("daily_again") : t("daily")}</button>
+    ${streak > 0 ? `<p class="streak">${doneToday ? t("done_today") : t("todo_today")} · ${t("streak")} <b>${streak}</b> ${streak>1?t("days"):t("day")}${S.daily.best>streak?` · ${t("record")} ${S.daily.best}`:""}</p>` : ""}
+    <div class="btn-row"><button class="btn ghost" data-act="packs">${t("pick_pack")}</button></div>
   </section>
 
   <div class="panel">
     <div class="level-row">
       <div class="level-badge">${lv.emoji}</div>
       <div style="flex:1;min-width:0">
-        <div class="level-name">${lv.name}</div>
-        <div class="level-next">${nx ? `encore <b class="num">${nx.min - S.xp}</b> XP avant ${nx.name}` : "palier maximum atteint"}</div>
+        <div class="level-name">${tf(lv,"name")}</div>
+        <div class="level-next">${nx ? `${t("to_next")} <b class="num">${nx.min - S.xp}</b> ${t("before")} ${tf(nx,"name")}` : t("maxed")}</div>
       </div>
     </div>
     <div class="bar"><i style="width:${pct}%"></i></div>
   </div>
 
   <div class="stat-row">
-    <div class="stat"><b>${S.seen.length}</b><span>Maîtrisées</span></div>
-    <div class="stat"><b>${S.cards.length}</b><span>Cartes</span></div>
-    <div class="stat"><b>${badgesOf().length}</b><span>Badges</span></div>
+    <div class="stat"><b>${S.seen.length}</b><span>${t("mastered")}</span></div>
+    <div class="stat"><b>${S.cards.length}</b><span>${t("cards")}</span></div>
+    <div class="stat"><b>${badgesOf().length}</b><span>${t("badges")}</span></div>
   </div>
   <p class="sig">by KizFlow Studio</p>`;
 }
 
 function viewPacks(){
-  return `<p class="eyebrow">Neuf parcours</p><h2 style="margin-bottom:14px">Choisis ton terrain</h2>` +
+  return `<p class="eyebrow">${t("packs_eyebrow")}</p><h2 style="margin-bottom:14px">${t("packs_title")}</h2>` +
   PACKS.map(p => {
     const locked = S.xp < p.unlock;
     const m = masteryOf(p.id);
     const pool = poolOf(p.id).length;
     return `<button class="pack ${locked?"locked":""} ${m===100?"done":""}" data-pack="${p.id}" ${locked?'aria-disabled="true"':""}>
       <span class="emo">${p.emoji}</span>
-      <span class="ttl"><h3>${p.title}</h3><span class="lvl">${p.lvl}</span></span>
-      <p>${p.desc}</p>
+      <span class="ttl"><h3>${tf(p,"title")}</h3><span class="lvl">${tf(p,"lvl")}</span></span>
+      <p>${tf(p,"desc")}</p>
       <span class="meta">
-        ${locked ? `🔒 ${p.unlock} XP requis` : `${Math.min(p.size,pool)} questions · ${pool} au total`}
-        ${!locked ? `<span class="mastery">${m===100?"★ Maîtrisé":m+" %"}</span>` : ""}
+        ${locked ? `🔒 ${p.unlock} ${t("xp_needed")}` : `${Math.min(p.size,pool)} ${t("questions")} · ${pool} ${t("of_total")}`}
+        ${!locked ? `<span class="mastery">${m===100?t("full"):m+" %"}</span>` : ""}
       </span>
     </button>`;
   }).join("");
@@ -874,15 +1016,16 @@ function viewPacks(){
 
 function viewQuiz(){
   const q = S.queue[S.idx];
-  if(!q){ return `<div class="empty"><span>◇</span>Session vide. Reviens aux packs.</div>`; }
+  if(!q){ return `<div class="empty"><span>◇</span>${t("empty_session")}</div>`; }
   const beats = S.queue.map((_,i) => `<b class="${i < S.idx ? "past" : i === S.idx ? "now" : ""}"></b>`).join("");
   return `
   <div class="count">${beats}</div>
-  <div class="count-lbl"><span>${S.pack.emoji} ${S.pack.title}</span><span>${S.idx+1} / ${S.queue.length}</span></div>
+  <div class="count-lbl"><span>${S.pack.emoji} ${tf(S.pack,"title")}</span><span>${S.idx+1} / ${S.queue.length}</span></div>
 
   <span class="q-mod">${esc(q.m)}</span>
   <div class="q-text">${esc(q.q)}</div>
-  ${q.t === "multi" ? `<div class="q-hint">◆ Plusieurs bonnes réponses</div>` : ""}
+  ${q.t === "multi" ? `<div class="q-hint">${t("multi")}</div>` : ""}
+  ${LANG === "en" && !q.en ? `<div class="q-note">${t("not_translated")}</div>` : ""}
 
   ${q.o.map((text,i) => {
     let cls = "";
@@ -897,47 +1040,47 @@ function viewQuiz(){
   }).join("")}
 
   ${S.done ? `<div class="explain ${S.ok?"":"ko"}">
-      <b>${S.ok ? "Bien vu" : "Pas tout à fait"}</b>${esc(q.e)}${q.s ? `<span class="src">Source · ${esc(q.s)}</span>` : ""}
-      <a class="report" href="${reportLink(q)}">Cette question te semble fausse ? Signale-la.</a>
+      <b>${S.ok ? t("good") : t("bad")}</b>${esc(q.e)}${q.s ? `<span class="src">${t("source")} · ${esc(q.s)}</span>` : ""}
+      <a class="report" href="${reportLink(q)}">${t("report")}</a>
     </div>` : ""}
 
   ${S.done
-    ? `<button class="btn" data-act="next">${S.idx >= S.queue.length-1 ? "Voir le résultat" : "Question suivante"} →</button>`
-    : `<button class="btn" data-act="validate" ${S.picked.length?"":"disabled"}>Valider</button>`}
-  <div class="btn-row"><button class="btn ghost" data-act="packs">Quitter</button></div>`;
+    ? `<button class="btn" data-act="next">${S.idx >= S.queue.length-1 ? t("see_result") : t("next_q")} →</button>`
+    : `<button class="btn" data-act="validate" ${S.picked.length?"":"disabled"}>${t("validate")}</button>`}
+  <div class="btn-row"><button class="btn ghost" data-act="packs">${t("quit")}</button></div>`;
 }
 
 function viewResults(){
   const pct = Math.round(100 * S.score / Math.max(1,S.queue.length));
   return `
   <div class="skin skin-results">
-    <p class="eyebrow">${S.pack.emoji} ${S.pack.title}</p>
-    <div class="score-ring" style="--pct:${pct}%"><div><b>${S.score}<span style="font-size:17px;color:var(--muted)">/${S.queue.length}</span></b><span>Score</span></div></div>
+    <p class="eyebrow">${S.pack.emoji} ${tf(S.pack,"title")}</p>
+    <div class="score-ring" style="--pct:${pct}%"><div><b>${S.score}<span style="font-size:17px;color:var(--muted)">/${S.queue.length}</span></b><span>${t("score")}</span></div></div>
   </div>
 
   <div class="stat-row">
-    <div class="stat"><b>+${S.gained}</b><span>XP gagnés</span></div>
-    <div class="stat"><b>${S.fresh.length}</b><span>Cartes</span></div>
-    <div class="stat"><b>${pct}%</b><span>Réussite</span></div>
+    <div class="stat"><b>+${S.gained}</b><span>${t("xp_won")}</span></div>
+    <div class="stat"><b>${S.fresh.length}</b><span>${t("cards")}</span></div>
+    <div class="stat"><b>${pct}%</b><span>${t("success")}</span></div>
   </div>
 
   ${S.fresh.length ? `<div class="panel">
-    <p class="eyebrow" style="margin-bottom:10px">Nouvelles cartes</p>
+    <p class="eyebrow" style="margin-bottom:10px">${t("new_cards")}</p>
     <div class="cards-grid">${S.fresh.map(c => ccard(c)).join("")}</div>
   </div>` : ""}
 
   <div class="panel">
-    <p class="eyebrow" style="margin-bottom:4px">Ce que tu retiens</p>
+    <p class="eyebrow" style="margin-bottom:4px">${t("recap")}</p>
     ${S.log.map(l => `<div class="recap">
       <span class="dot ${l.right?"ok":"ko"}"></span>
       <div><div>${esc(l.q)}</div><p>${l.right ? "✓ " + esc(l.good.join(" · ")) : "→ " + esc(l.good.join(" · "))}</p></div>
     </div>`).join("")}
   </div>
 
-  <button class="btn" data-act="replay">Rejouer ce pack</button>
+  <button class="btn" data-act="replay">${t("replay")}</button>
   <div class="btn-row">
-    <button class="btn ghost" data-act="packs">Packs</button>
-    <button class="btn ghost" data-act="cards">Mes cartes</button>
+    <button class="btn ghost" data-act="packs">${t("nav_packs")}</button>
+    <button class="btn ghost" data-act="cards">${t("my_cards")}</button>
   </div>`;
 }
 
@@ -954,48 +1097,48 @@ function ccard(c, index){
 function viewCards(){
   if(!S.cards.length){
     return `<p class="eyebrow">Collection</p><h2 style="margin-bottom:14px">Mes cartes</h2>
-    <div class="empty"><span>✦</span>Aucune carte pour l'instant.<br>Chaque bonne réponse inédite en débloque une.</div>
-    <div class="btn-row"><button class="btn" data-act="packs">Commencer</button></div>`;
+    <div class="empty"><span>✦</span>${t("no_card")}</div>
+    <div class="btn-row"><button class="btn" data-act="packs">${t("start")}</button></div>`;
   }
   const badges = badgesOf();
   return `
   <div class="skin skin-cards">
-    <p class="eyebrow">${S.cards.length} carte${S.cards.length>1?"s":""} débloquée${S.cards.length>1?"s":""}</p>
-    <h2>Ma collection</h2>
+    <p class="eyebrow">${S.cards.length} ${S.cards.length>1?t("cardp"):t("card")} ${S.cards.length>1?t("unlockeds"):t("unlocked")}</p>
+    <h2>${t("collection")}</h2>
   </div>
 
   <div class="panel">
-    <p class="eyebrow" style="margin-bottom:10px">Badges de maîtrise</p>
+    <p class="eyebrow" style="margin-bottom:10px">${t("badge_title")}</p>
     ${badges.length
       ? `<div class="badge-row">${badges.map(b => `<span class="badge ${b.tier.min===100?"gold":""}">
-            <b>${b.tier.emoji}</b>${esc(b.pack.title)}<i>${b.tier.label}</i></span>`).join("")}</div>`
-      : `<p style="font-size:13px;margin:0">Aucun badge pour l'instant. Réponds juste à la moitié des questions d'un pack pour décrocher le premier.</p>`}
+            <b>${b.tier.emoji}</b>${esc(tf(b.pack,"title"))}<i>${b.tier.label}</i></span>`).join("")}</div>`
+      : `<p style="font-size:13px;margin:0">${t("no_badge")}</p>`}
   </div>
 
   <div class="cards-grid">${S.cards.map((c,i) => ccard(c,i)).join("")}</div>
-  <div class="btn-row"><button class="btn danger" data-act="reset">Remettre la progression à zéro</button></div>`;
+  <div class="btn-row"><button class="btn danger" data-act="reset">${t("reset")}</button></div>`;
 }
 
 function viewInfos(){
-  return `<p class="eyebrow">La règle de la maison</p>
-  <h2 style="margin-bottom:14px">Culture, pas verdict</h2>
+  return `<p class="eyebrow">${t("infos_eyebrow")}</p>
+  <h2 style="margin-bottom:14px">${t("infos_title")}</h2>
   <div class="panel">
-    <h3 style="margin-bottom:8px">Ce que cette app fait</h3>
-    <p style="font-size:13.5px">Elle transmet des repères sur la Kizomba, le Semba, l'Urban Kiz, le Tarraxo, la Tarraxinha et le Ghetto Zouk. Elle sépare toujours ce qui relève de la musique de ce qui relève de la danse.</p>
+    <h3 style="margin-bottom:8px">${t("does_t")}</h3>
+    <p style="font-size:13.5px">${t("does_b")}</p>
   </div>
   <div class="panel">
-    <h3 style="margin-bottom:8px">Ce qu'elle ne fait pas</h3>
-    <p style="font-size:13.5px">Elle ne tranche pas les débats de la scène. Sur les origines de l'Urban Kiz, sur les rôles de chacun, sur la frontière entre Tarraxinha et Tarraxo, elle dit « souvent présenté comme » et laisse la discussion ouverte.</p>
+    <h3 style="margin-bottom:8px">${t("not_t")}</h3>
+    <p style="font-size:13.5px">${t("not_b")}</p>
   </div>
   <div class="panel">
-    <h3 style="margin-bottom:8px">Une question te semble fausse ?</h3>
-    <p style="font-size:13.5px">Elle l'est peut-être. Les récits de scène se contredisent et cette app n'est pas au-dessus. Écris-nous et on corrige, source à l'appui.</p>
-    <a class="btn ghost" style="text-decoration:none" href="mailto:${CONTACT}?subject=${encodeURIComponent("Kizomba Urban Quiz - remarque")}">Nous écrire</a>
+    <h3 style="margin-bottom:8px">${t("wrong_t")}</h3>
+    <p style="font-size:13.5px">${t("wrong_b")}</p>
+    <a class="btn ghost" style="text-decoration:none" href="mailto:${CONTACT}?subject=${encodeURIComponent("Kizomba Urban Quiz - remarque")}">${t("write_us")}</a>
   </div>
   <div class="stat-row">
-    <div class="stat"><b>${QUESTIONS.length}</b><span>Questions</span></div>
-    <div class="stat"><b>${PACKS.length}</b><span>Packs</span></div>
-    <div class="stat"><b>${new Set(QUESTIONS.map(q=>q.m)).size}</b><span>Thèmes</span></div>
+    <div class="stat"><b>${QUESTIONS.length}</b><span>${t("questions")}</span></div>
+    <div class="stat"><b>${PACKS.length}</b><span>${t("nav_packs")}</span></div>
+    <div class="stat"><b>${new Set(QUESTIONS.map(q=>q.m)).size}</b><span>${t("themes")}</span></div>
   </div>
   <p class="sig">by KizFlow Studio</p>`;
 }
@@ -1033,6 +1176,19 @@ document.getElementById("view").addEventListener("click", e => {
   if(a === "reset")    return resetAll();
   if(a === "replay")   return S.pack.id === "daily" ? startDaily() : startPack(S.pack.id);
 });
+
+document.getElementById("langBtn").addEventListener("click", e => {
+  const b = e.target.closest("button[data-lang]");
+  if(b) setLang(b.dataset.lang);
+});
+
+/* on applique la langue détectée avant le premier rendu */
+document.documentElement.lang = LANG;
+document.getElementById("sndBtn").setAttribute("aria-label", t("sound"));
+document.querySelectorAll("#nav button em").forEach(el =>
+  el.textContent = t("nav_" + el.parentElement.dataset.go));
+document.querySelectorAll("#langBtn button").forEach(b =>
+  b.setAttribute("aria-pressed", String(b.dataset.lang === LANG)));
 
 go("home");
 </script>
