@@ -10,6 +10,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="Kizomba Urban Quiz" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Kizomba Urban Quiz" />
+<meta property="og:title" content="Kizomba Urban Quiz" />
+<meta property="og:description" content="141 questions sur la culture kizomba, semba, urban kiz, tarraxo et ghetto zouk. Et on cite nos sources." />
+<meta property="og:url" content="https://kizomba-urban-quiz.vercel.app/" />
+<meta property="og:image" content="https://kizomba-urban-quiz.vercel.app/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="fr_FR" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Kizomba Urban Quiz" />
+<meta name="twitter:description" content="141 questions sur la culture kizomba. Et on cite nos sources." />
+<meta name="twitter:image" content="https://kizomba-urban-quiz.vercel.app/og.jpg" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
@@ -362,6 +375,11 @@ p{margin:0 0 12px;color:var(--muted)}
   background:rgba(19,12,34,.97);border:1px solid rgba(164,114,255,.4);
   box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
+.report{
+  display:block;margin-top:10px;font-size:11.5px;color:var(--muted);
+  text-decoration:underline;text-underline-offset:3px;
+}
+.report:active{color:var(--gold)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .sig{text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--muted);
      text-transform:uppercase;margin:22px 0 0;opacity:.6}
@@ -439,6 +457,10 @@ const PACKS = [
   {id:"pionniers", title:"Pionniers", emoji:"👑",lvl:"Difficile",unlock:450,size:8,desc:"Figures, DJs et récits de scène — avec nuance."},
   {id:"galactic",  title:"Galactic",  emoji:"🚀",lvl:"Ultime", unlock:600,size:8, desc:"Le dernier palier. Nuance obligatoire."}
 ];
+
+/* ⚠️ REMPLACE cette adresse par la tienne. C'est la seule ligne à changer
+   pour que le bouton « Signaler une erreur » fonctionne. */
+const CONTACT = "contact@kizflowstudio.com";
 
 const K = {xp:"kizombaUrban_xp_v3", cards:"kizombaUrban_cards_v3", seen:"kizombaUrban_seen_v3", daily:"kizombaUrban_daily_v3"};
 
@@ -535,6 +557,19 @@ function xpFor(q, right){
   if(!right) return 0;
   if(S.seen.includes(q.i)) return 2;
   return q.t === "multi" ? 16 : (q.p === "galactic" || q.p === "pionniers" ? 18 : 10);
+}
+
+function reportLink(q){
+  const sujet = "Erreur signalee - " + q.i;
+  const corps =
+    "Question : " + q.q + "\n" +
+    "Reponse donnee comme juste : " + q.c.map(i => q.o[i]).join(" / ") + "\n" +
+    (q.s ? "Source affichee : " + q.s + "\n" : "Aucune source affichee\n") +
+    "\nCe qui me semble faux :\n\n" +
+    "\nMa source :\n\n";
+  return "mailto:" + CONTACT +
+         "?subject=" + encodeURIComponent(sujet) +
+         "&body=" + encodeURIComponent(corps);
 }
 
 let toastTimer;
@@ -704,6 +739,18 @@ function drawLogo(ctx, cx, cy, r, w){
 function shareCard(index){
   const c = S.cards[index];
   if(!c) return;
+  /* On charge la texture dorée, mais on ne la rend jamais obligatoire :
+     si elle manque ou traîne, la carte part quand même. */
+  const tex = new Image();
+  let launched = false;
+  const go = () => { if(launched) return; launched = true;
+                     drawShare(c, tex.naturalWidth ? tex : null); };
+  tex.onload = go; tex.onerror = go;
+  tex.src = "share-bg.jpg";
+  setTimeout(go, 1500);
+}
+
+function drawShare(c, tex){
   const W = 1080, H = 1350;
   const cv = document.createElement("canvas");
   cv.width = W; cv.height = H;
@@ -712,6 +759,16 @@ function shareCard(index){
   const bg = x.createLinearGradient(0, 0, W, H);
   bg.addColorStop(0, "#150a2b"); bg.addColorStop(0.55, "#0b0616"); bg.addColorStop(1, "#05030a");
   x.fillStyle = bg; x.fillRect(0, 0, W, H);
+
+  if(tex){
+    x.globalAlpha = 0.62;
+    x.drawImage(tex, 0, 0, W, H);
+    x.globalAlpha = 1;
+    const veil = x.createRadialGradient(W/2, H/2, W*0.14, W/2, H/2, W*0.80);
+    veil.addColorStop(0, "rgba(5,3,10,.80)");
+    veil.addColorStop(1, "rgba(5,3,10,.18)");
+    x.fillStyle = veil; x.fillRect(0, 0, W, H);
+  }
 
   x.strokeStyle = "rgba(232,184,75,.55)"; x.lineWidth = 4;
   x.strokeRect(52, 52, W-104, H-104);
@@ -841,6 +898,7 @@ function viewQuiz(){
 
   ${S.done ? `<div class="explain ${S.ok?"":"ko"}">
       <b>${S.ok ? "Bien vu" : "Pas tout à fait"}</b>${esc(q.e)}${q.s ? `<span class="src">Source · ${esc(q.s)}</span>` : ""}
+      <a class="report" href="${reportLink(q)}">Cette question te semble fausse ? Signale-la.</a>
     </div>` : ""}
 
   ${S.done
@@ -931,7 +989,8 @@ function viewInfos(){
   </div>
   <div class="panel">
     <h3 style="margin-bottom:8px">Une question te semble fausse ?</h3>
-    <p style="font-size:13.5px;margin-bottom:0">Elle l'est peut-être. Les récits de scène se contredisent et cette app n'est pas au-dessus. Écris-nous et on corrige, source à l'appui.</p>
+    <p style="font-size:13.5px">Elle l'est peut-être. Les récits de scène se contredisent et cette app n'est pas au-dessus. Écris-nous et on corrige, source à l'appui.</p>
+    <a class="btn ghost" style="text-decoration:none" href="mailto:${CONTACT}?subject=${encodeURIComponent("Kizomba Urban Quiz - remarque")}">Nous écrire</a>
   </div>
   <div class="stat-row">
     <div class="stat"><b>${QUESTIONS.length}</b><span>Questions</span></div>
