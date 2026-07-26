@@ -198,7 +198,7 @@ p{margin:0 0 12px;color:var(--muted)}
 /* ---------- accueil ---------- */
 .hero{
   position:relative;border-radius:20px;overflow:hidden;
-  padding:26px 18px 22px;margin-bottom:14px;
+  padding:20px 18px 20px;margin-bottom:14px;
   background:
     radial-gradient(90% 46% at 50% 0%,rgba(232,184,75,.13),transparent 62%),
     var(--velvet);
@@ -206,8 +206,8 @@ p{margin:0 0 12px;color:var(--muted)}
   box-shadow:var(--sheen);
 }
 .crest{
-  display:block;width:min(45vw,152px);height:auto;margin:2px auto 14px;
-  filter:drop-shadow(0 10px 30px rgba(232,184,75,.24));
+  display:block;width:min(36vw,118px);height:auto;margin:0 auto 12px;
+  filter:drop-shadow(0 8px 24px rgba(232,184,75,.22));
 }
 .hero h1{margin-bottom:10px}
 .hero h1 em{
@@ -216,24 +216,22 @@ p{margin:0 0 12px;color:var(--muted)}
   font-family:var(--body);
 }
 .hero p{
-  margin:0 auto 18px;font-size:14px;max-width:36ch;
+  margin:0 auto 14px;font-size:13.5px;max-width:34ch;
   text-align:center;color:var(--muted);
 }
 
 /* Deux raccourcis vers les apps musicales. Simples liens : ils ouvrent l'app
    native, qui continue de jouer pendant le quiz. Volontairement secondaires. */
-.tunes{display:flex;gap:10px;margin:0 auto 16px;max-width:360px}
+.tunes{display:flex;justify-content:center;margin:0 auto 18px}
 .tunes a{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
-  min-height:44px;border-radius:999px;text-decoration:none;
-  background:rgba(255,255,255,.04);border:1px solid rgba(232,184,75,.16);
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:44px;padding:0 18px;border-radius:999px;text-decoration:none;
+  background:rgba(255,255,255,.03);border:1px solid rgba(232,184,75,.13);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--muted);transition:border-color .16s,color .16s;
 }
-.tunes a b{font-size:14px;line-height:1}
+.tunes a b{font-size:13px;line-height:1;color:#FF7A3D}
 .tunes a:active{color:var(--paper);border-color:var(--line-strong)}
-.tunes .sp b{color:#4ED97F}
-.tunes .sc b{color:#FF7A3D}
 
 /* ---------- niveau et progression ---------- */
 .level-row{display:flex;align-items:center;gap:13px;margin-bottom:11px}
@@ -1111,8 +1109,7 @@ function viewHome(){
     <img class="crest" src="logo-round-512.png" alt="Kizomba Urban Quiz" width="512" height="512" loading="eager" />
     <p>${t("hero_p")}</p>
     <div class="tunes">
-      <a class="sp" href="https://open.spotify.com/search/kizomba" target="_blank" rel="noopener" data-tune aria-label="${t("open_in")} Spotify"><b>♫</b>Spotify</a>
-      <a class="sc" href="https://soundcloud.com/search?q=kizomba" target="_blank" rel="noopener" data-tune aria-label="${t("open_in")} SoundCloud"><b>♫</b>SoundCloud</a>
+      <a class="sc" href="https://soundcloud.com/search?q=kizomba" data-tune aria-label="${t("open_in")} SoundCloud"><b>♫</b>SoundCloud</a>
     </div>
     <button class="btn gold" data-act="daily">${doneToday ? t("daily_again") : t("daily")}</button>
     ${streak > 0 ? `<p class="streak">${doneToday ? t("done_today") : t("todo_today")} · ${t("streak")} <b>${streak}</b> ${streak>1?t("days"):t("day")}${S.daily.best>streak?` · ${t("record")} ${S.daily.best}`:""}</p>` : ""}
