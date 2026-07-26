@@ -194,19 +194,21 @@ p{margin:0 0 12px;color:var(--muted)}
 .hero h1{margin-bottom:10px}
 .hero h1 em{font-style:normal;display:block;color:var(--gold);font-size:.5em;letter-spacing:.38em;font-weight:700;margin-bottom:8px}
 .hero p{margin:0 auto 16px;font-size:14px;max-width:38ch;text-align:center;color:#B4A8D4}
-.tempo{display:flex;align-items:center;gap:9px;margin:0 auto 16px;max-width:360px}
-.tempo-track{
-  position:relative;flex:1;height:2px;border-radius:2px;
-  background:linear-gradient(90deg,rgba(164,114,255,.35),rgba(47,224,200,.22));
-  overflow:hidden;
+/* Deux raccourcis vers les apps musicales. Ce sont de simples liens : ils
+   ouvrent l'app native du téléphone, qui continue de jouer en arrière-plan
+   pendant le quiz. Aucune image, aucune dépendance. */
+.tunes{display:flex;gap:10px;margin:0 auto 16px;max-width:360px}
+.tunes a{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  min-height:44px;border-radius:999px;text-decoration:none;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  color:var(--muted);transition:border-color .16s,color .16s;
 }
-.tempo-track::after{
-  content:"";position:absolute;top:-2px;left:0;width:34px;height:6px;border-radius:6px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);
-  animation:sweep 2.82s linear infinite; /* ~85 bpm, 4 temps */
-}
-.tempo-lbl{font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.1em}
-@keyframes sweep{from{transform:translateX(-40px)}to{transform:translateX(520px)}}
+.tunes a b{font-size:14px;line-height:1}
+.tunes a:active{color:var(--paper);border-color:rgba(164,114,255,.45)}
+.tunes .sp b{color:#4ED97F}
+.tunes .sc b{color:#FF7A3D}
 
 /* ---------- niveau ---------- */
 .level-row{display:flex;align-items:center;gap:12px;margin-bottom:9px}
@@ -521,7 +523,6 @@ p{margin:0 0 12px;color:var(--muted)}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-  .tempo-track::after{display:none}
 }
 </style>
 </head>
@@ -573,7 +574,7 @@ const QUESTIONS = [{"i":"q274","p":"decouverte","m":"Bases","t":"multi","q":"Que
 const DICT = {
   fr:{
     nav_home:"Accueil", nav_packs:"Packs", nav_cards:"Cartes", nav_infos:"Culture",
-    sound:"Activer le son d'ambiance", tagline_1:"Quiz", tagline_2:"Kizomba", tagline_3:"Urban",
+    sound:"Activer le son d'ambiance", open_in:"Ouvrir dans", tagline_1:"Quiz", tagline_2:"Kizomba", tagline_3:"Urban",
     hero_p:"La culture, les racines et les évolutions. Sans trancher les débats à la place de personne.",
     daily:"☀️ Quiz du jour — 5 questions", daily_again:"☀️ Quiz du jour — refaire",
     done_today:"✓ Fait aujourd'hui", todo_today:"À faire aujourd'hui",
@@ -614,7 +615,7 @@ const DICT = {
   },
   en:{
     nav_home:"Home", nav_packs:"Packs", nav_cards:"Cards", nav_infos:"Culture",
-    sound:"Turn on ambient sound", tagline_1:"Quiz", tagline_2:"Kizomba", tagline_3:"Urban",
+    sound:"Turn on ambient sound", open_in:"Open in", tagline_1:"Quiz", tagline_2:"Kizomba", tagline_3:"Urban",
     hero_p:"The culture, the roots and how they changed. Without settling the scene's arguments for you.",
     daily:"☀️ Daily quiz — 5 questions", daily_again:"☀️ Daily quiz — play again",
     done_today:"✓ Done today", todo_today:"Not done today",
@@ -1092,10 +1093,9 @@ function viewHome(){
   <section class="hero">
     <img class="crest" src="logo-round-512.png" alt="Kizomba Urban Quiz" width="512" height="512" loading="eager" />
     <p>${t("hero_p")}</p>
-    <div class="tempo">
-      <span class="tempo-lbl">85 BPM</span>
-      <span class="tempo-track"></span>
-      <span class="tempo-lbl">1·2·3·4</span>
+    <div class="tunes">
+      <a class="sp" href="https://open.spotify.com/search/kizomba" target="_blank" rel="noopener" data-tune aria-label="${t("open_in")} Spotify"><b>♫</b>Spotify</a>
+      <a class="sc" href="https://soundcloud.com/search?q=kizomba" target="_blank" rel="noopener" data-tune aria-label="${t("open_in")} SoundCloud"><b>♫</b>SoundCloud</a>
     </div>
     <button class="btn gold" data-act="daily">${doneToday ? t("daily_again") : t("daily")}</button>
     ${streak > 0 ? `<p class="streak">${doneToday ? t("done_today") : t("todo_today")} · ${t("streak")} <b>${streak}</b> ${streak>1?t("days"):t("day")}${S.daily.best>streak?` · ${t("record")} ${S.daily.best}`:""}</p>` : ""}
@@ -1292,6 +1292,12 @@ document.getElementById("view").addEventListener("click", e => {
   if(pk) return startPack(pk.dataset.pack);
   const sh = e.target.closest("[data-share]");
   if(sh) return shareCard(Number(sh.dataset.share));
+  const tune = e.target.closest("[data-tune]");
+  if(tune){
+    if(S.sound){ amb.pause(); S.sound = false;
+      const sb = document.getElementById("sndBtn"); if(sb) sb.setAttribute("aria-pressed","false"); }
+    return;                     // on laisse le lien s'ouvrir normalement
+  }
   const act = e.target.closest("[data-act]");
   if(!act) return;
   const a = act.dataset.act;
