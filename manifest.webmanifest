@@ -1,36 +1,8 @@
-{
-  "name": "Kizomba Urban Quiz",
-  "short_name": "Kiz Urban",
-  "description": "Quiz culture Kizomba, Urban Kiz, Semba, Tarraxo, Tarraxinha et Ghetto Zouk.",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#05030a",
-  "theme_color": "#05030a",
-  "lang": "fr",
-  "categories": [
-    "education",
-    "entertainment"
-  ],
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
-}
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.kizflowstudio.kizombaurbanquiz",
+        "sha256_cert_fingerprints": ["47:38:0E:32:D8:ED:6D:4E:00:0E:79:16:99:1D:54:03:6C:67:B7:8F:ED:21:A6:71:53:49:48:4D:90:31:BC:54"]
+      }
+    }]
