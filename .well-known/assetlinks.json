@@ -1,1 +1,8 @@
-
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.kizflowstudio.kizombaurbanquiz",
+        "sha256_cert_fingerprints": ["03:EA:CD:E7:9B:D9:C9:B1:FE:6B:2A:09:11:5F:C3:5D:90:06:F0:3B:AC:11:37:AF:9B:17:A7:A1:A2:6D:D2:BA"]
+      }
+    }]
